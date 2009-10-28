@@ -11,7 +11,7 @@ import org.sumerit.paperless.components.RPCCommand;
 import org.sumerit.paperless.components.RPCResponse;
 import org.sumerit.paperless.constants.RPCState;
 import org.sumerit.paperless.io.IntWritable;
-import org.sumerit.paperless.logging.Logger;
+import org.sumerit.paperless.logging.DistributedLogger;
 
 public class HttpConnector extends InternetConnector 
 {
@@ -30,9 +30,9 @@ public class HttpConnector extends InternetConnector
 	public boolean initiateRPC(String proc) 
 	{
 		try {
-			ServerSocket listener = new ServerSocket();
+			ServerSocket listener = new ServerSocket(0);
 			DataOutputStream os = new DataOutputStream(this.socket.getOutputStream());						
-			RPCCommand cmd = new RPCCommand(RPCCommand.CHECK, proc, listener.getLocalPort());
+			RPCCommand cmd = new RPCCommand(RPCCommand.CHECK_AVAILABLE, proc, listener.getLocalPort());
 			RPCResponse response = new RPCResponse(new IntWritable());
 			
 			cmd.write(os);	
@@ -49,10 +49,10 @@ public class HttpConnector extends InternetConnector
 				return false;
 			
 		} catch (IOException e) {
-			Logger.getInstance().fatal("HttpConnector::initiateRPC(): Could not connect to host (IO Exception): " + e.getMessage());
+			DistributedLogger.fatal("HttpConnector::initiateRPC(): Could not connect to host (IO Exception): " + e.getMessage());
 			return false;
 		} catch (Exception e) {
-			Logger.getInstance().fatal("HttpConnector::initiateRPC(): Could not connect to host (Unknown Exception): " + e.getMessage());
+			DistributedLogger.fatal("HttpConnector::initiateRPC(): Could not connect to host (Unknown Exception): " + e.getMessage());
 			return false;
 		}	
 	}

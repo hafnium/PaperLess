@@ -8,7 +8,7 @@ import org.sumerit.paperless.io.Writable;
 
 public class RPCCommand implements Writable
 {
-	public static final int CHECK = 0x1;
+	public static final int CHECK_AVAILABLE = 0x1;
 	
 	private int type;
 	private String args;
@@ -17,6 +17,8 @@ public class RPCCommand implements Writable
 	 * Callback port
 	 */
 	private int callback;
+	
+	public RPCCommand(){};
 	
 	public RPCCommand(int type, String args, int callback)
 	{

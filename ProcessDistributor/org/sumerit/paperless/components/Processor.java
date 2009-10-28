@@ -3,20 +3,22 @@ package org.sumerit.paperless.components;
 import org.sumerit.paperless.connection.InternetConnector;
 import org.sumerit.paperless.events.RPCEvent;
 import org.sumerit.paperless.events.RPCListener;
+import org.sumerit.paperless.logging.DistributedLogger;
 
 public class Processor 
 {
-	private String hostname;
-	private String ip;
 	private InternetConnector connector;
 	
 	private RPCListener listener;
 	
-	public Processor(){};
-	
-	public boolean connect()
+	public Processor(InternetConnector connector)
 	{
-		return connector.connect(this.hostname);
+		this.connector = connector;
+	};
+	
+	public boolean connect(String hostname)
+	{
+		return connector.connect(hostname);
 	}
 	
 	public void handleRPCFinished(RPCResponse response)
@@ -27,11 +29,14 @@ public class Processor
 	
 	public synchronized void callRPC(final String proc)
 	{
+		DistributedLogger.info("Making RPC call to function: " + proc);
 		Thread runner = new Thread(){
 			public void run()
 			{
-				connector.initiateRPC(proc);
-				handleRPCFinished(connector.getRPCResult());
+				if (connector.initiateRPC(proc))
+				{
+					handleRPCFinished(connector.getRPCResult());
+				} 
 			}
 		};
 	}
