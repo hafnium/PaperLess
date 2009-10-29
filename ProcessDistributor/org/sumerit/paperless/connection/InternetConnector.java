@@ -1,41 +1,67 @@
 package org.sumerit.paperless.connection;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 
+import org.sumerit.paperless.components.RPCCommand;
 import org.sumerit.paperless.components.RPCResponse;
+import org.sumerit.paperless.constants.RPCState;
+import org.sumerit.paperless.io.IntWritable;
 import org.sumerit.paperless.logging.DistributedLogger;
 
 public abstract class InternetConnector 
 {
 	protected Socket socket = null;
+	
+	protected OutputStream out = null;
+	
 	protected ServerSocket listeningSocket = null;
 	protected RPCResponse rpcResponse;
 	
 	public abstract int getPort();
 	
-	public void listen() throws IOException
+	public Socket accept() throws IOException
 	{
 		if (this.listeningSocket == null)
 			listeningSocket = new ServerSocket(this.getPort());
 		
-		listeningSocket.accept();
+		// BLOCKS
+		return listeningSocket.accept();
 	}
 	
-	public void getInputStream()
+	public void close() throws IOException
+	{
+		if (this.socket != null)
+			this.socket.close();
+		if (this.listeningSocket != null)
+			this.listeningSocket.close();
+		if (this.out != null)
+			this.out.close();
+	}
 	
-	public boolean connect(String hostname) 
+	public boolean connect(String hostname, int port) 
 	{
 		if (socket != null && socket.isConnected())
 		{
 			DistributedLogger.warning("InternetConnector::connect(): Client already connected to server");
 			return false;
-		}
+		}		
 		
 		try {
-			socket = new Socket(hostname, this.getPort());
+			DistributedLogger.debug("Connecting to " + hostname + ":" + port);
+			
+			socket = new Socket(hostname, port);
+			this.out = socket.getOutputStream();
+			
+			DistributedLogger.debug("Connected!");
 		} catch (UnknownHostException e) {
 			DistributedLogger.fatal("InternetConnector::connect(): Could not connect to host (Unknown Host): " + e.getMessage());
 			return false;
@@ -58,7 +84,11 @@ public abstract class InternetConnector
 		}
 		
 		try {
+			out.close();
 			socket.close();
+			
+			out = null;
+			socket = null;
 		} catch (IOException e) {
 			DistributedLogger.fatal("HttpConnector::disconnect(): Could not disconnect from host (IO Exception): " + e.getMessage());
 			return false;
@@ -69,7 +99,17 @@ public abstract class InternetConnector
 		return true;
 	}
 	
-	public abstract boolean initiateRPC(String proc);
-	public abstract boolean invokeRPC(String[] args);
-	public abstract RPCResponse getRPCResult();
+	public OutputStream getOutputStream()
+	{
+		return this.out;
+	}
+	public Socket getSocket()
+	{
+		return this.socket;
+	}
+
+	public SocketAddress getRemoteSocketAddress() 
+	{
+		return this.socket.getRemoteSocketAddress();
+	}
 }

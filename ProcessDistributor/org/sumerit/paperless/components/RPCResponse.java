@@ -17,7 +17,7 @@ public class RPCResponse implements Writable
 		this.data = _data;
 	}
 	
-	public Writable getResponse()
+	public Writable getData()
 	{
 		return this.data;
 	}

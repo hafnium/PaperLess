@@ -1,43 +1,109 @@
 package org.sumerit.paperless.components;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Vector;
+
 import org.sumerit.paperless.connection.InternetConnector;
+import org.sumerit.paperless.constants.RPCState;
 import org.sumerit.paperless.events.RPCEvent;
 import org.sumerit.paperless.events.RPCListener;
+import org.sumerit.paperless.io.IntWritable;
 import org.sumerit.paperless.logging.DistributedLogger;
 
-public class Processor 
+public class Processor extends Thread
 {
+	private static int connCount = 0;
 	private InternetConnector connector;
 	
-	private RPCListener listener;
+	private Vector<RPCListener> listeners;
 	
 	public Processor(InternetConnector connector)
 	{
 		this.connector = connector;
+		this.listeners = new Vector<RPCListener>();
 	};
 	
 	public boolean connect(String hostname)
 	{
-		return connector.connect(hostname);
+		return connector.connect(hostname, connector.getPort());
+	}	
+	
+	public void addListener(RPCListener L)
+	{
+		this.listeners.add(L);
 	}
 	
-	public void handleRPCFinished(RPCResponse response)
+	public void callRPC(final String proc, final String args)
 	{
-		RPCEvent e = new RPCEvent(response);
-		listener.handleEvent(e);
-	}
-	
-	public synchronized void callRPC(final String proc)
-	{
-		DistributedLogger.info("Making RPC call to function: " + proc);
-		Thread runner = new Thread(){
-			public void run()
+		DistributedLogger.debug("Making RPC call to function: " + proc);
+		if (this.initiateRPC(proc))
+		{
+			DistributedLogger.debug("RPC call to function: " + proc + " accepted!");
+			RPCEvent e = new RPCEvent(this.invokeRPC(RPCCommand.EXECUTE, proc, args));
+			
+			if (listeners != null)
 			{
-				if (connector.initiateRPC(proc))
-				{
-					handleRPCFinished(connector.getRPCResult());
-				} 
-			}
-		};
+				for (int i = 0; i < listeners.size(); i++)
+					listeners.elementAt(i).handleEvent(e);
+			}			
+		} 
 	}
+		
+	public boolean initiateRPC(String proc) 
+	{
+		RPCResponse response = invokeRPC(RPCCommand.CHECK_AVAILABLE, proc, "");
+			
+		if (((IntWritable) response.getData()).get() == RPCState.SUCCESS)
+			return true;
+		else
+			return false;	
+	}
+	
+	public RPCResponse invokeRPC(int type, String proc, String args)
+	{
+		if(this.connector.getSocket() == null || !this.connector.getSocket().isConnected())
+		{
+			DistributedLogger.warning("Processor::initiateRPC(): Cannot initiate RPC because client is not connected");
+			return null;
+		}			
+		
+		try {
+			// Create incoming socket for response
+			DistributedLogger.debug("Creating incoming socket for response");
+			ServerSocket listener = new ServerSocket(0);
+			
+			// Write command to outgoing socket
+			RPCCommand cmd = new RPCCommand(type, proc, args, listener.getLocalPort());
+			DistributedLogger.debug("Writing command " + cmd.toString() + " to outbound socket");
+			DataOutputStream os = new DataOutputStream(this.connector.getOutputStream());								
+			
+			cmd.write(os);			
+			os.flush();
+			
+			// Listen for response on incoming socket (BLOCKS)
+			Socket localSocket = listener.accept();
+			
+			// Read back response
+			RPCResponse response = new RPCResponse(new IntWritable());
+			DataInputStream is = new DataInputStream(localSocket.getInputStream());			
+			response.readFrom(is);
+								
+			is.close();
+			localSocket.close();
+			listener.close();
+			
+			return response;
+		} catch (IOException e) {
+			DistributedLogger.fatal("Processor::initiateRPC(): Could not connect to host (IO Exception): " + e.getMessage());
+			return null;
+		} catch (Exception e) {
+			DistributedLogger.fatal("Processor::initiateRPC(): Could not connect to host (Unknown Exception): " + e.getMessage());
+			return null;
+		}
+	}	
 }

@@ -12,4 +12,9 @@ public class RPCEvent
 	{
 		this.response = _response;
 	}
+	
+	public RPCResponse getReponse()
+	{
+		return this.response;
+	}
 }

@@ -15,7 +15,7 @@ import org.sumerit.paperless.logging.DistributedLogger;
 
 public class HttpConnector extends InternetConnector 
 {
-	private static final int port = 80;
+	public static final int port = 8080;
 	
 	public int getPort()
 	{
@@ -25,36 +25,6 @@ public class HttpConnector extends InternetConnector
 	public RPCResponse getRPCResult() 
 	{
 		return this.rpcResponse;
-	}
-
-	public boolean initiateRPC(String proc) 
-	{
-		try {
-			ServerSocket listener = new ServerSocket(0);
-			DataOutputStream os = new DataOutputStream(this.socket.getOutputStream());						
-			RPCCommand cmd = new RPCCommand(RPCCommand.CHECK_AVAILABLE, proc, listener.getLocalPort());
-			RPCResponse response = new RPCResponse(new IntWritable());
-			
-			cmd.write(os);	
-						
-			// This next call blocks
-			Socket localSocket = listener.accept();
-			
-			DataInputStream is = new DataInputStream(localSocket.getInputStream());			
-			response.readFrom(is);
-			
-			if (((IntWritable) response.getResponse()).get() == RPCState.SUCCESS)
-				return true;
-			else
-				return false;
-			
-		} catch (IOException e) {
-			DistributedLogger.fatal("HttpConnector::initiateRPC(): Could not connect to host (IO Exception): " + e.getMessage());
-			return false;
-		} catch (Exception e) {
-			DistributedLogger.fatal("HttpConnector::initiateRPC(): Could not connect to host (Unknown Exception): " + e.getMessage());
-			return false;
-		}	
 	}
 
 	public boolean invokeRPC(String[] args) 
