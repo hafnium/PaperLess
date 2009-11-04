@@ -22,7 +22,7 @@ public class Tester implements ExceptionListener, RPCListener {
 	public static void main(String[] args) 
 	{
 		Tester T = new Tester();
-		DistributedLogger.setLevel(Level.ALL);
+		DistributedLogger.setLevel(Level.OFF);
 		//DistributedLogger.redirectOutput(new ConsoleHandler());	
 		
 		ReceiptProcessingServer server = new ReceiptProcessingServer(new HttpConnector());
@@ -39,6 +39,7 @@ public class Tester implements ExceptionListener, RPCListener {
 			server.start();
 			P.connect("localhost");
 			P.callRPC("processReceipt", "Orange 1.02");
+			P.callRPC("processReceipt", "Apple 2.02");
 		}			
 		
 		boolean prompt = true;
@@ -56,8 +57,11 @@ public class Tester implements ExceptionListener, RPCListener {
 			if (choice.matches("connect .*"))
 				P.connect(choice.split(" ")[1]);
 			
+			if (choice.matches("disconnect"))
+				P.disconnect();
+			
 			if (choice.matches("rpc [^ ]* .*"))
-				P.callRPC(choice.split(" ")[1], choice.split(" ")[2]);		
+				P.callRPC(choice.split(" ")[1], choice.split("\"")[1]);		
 			
 			if (choice.compareTo("quit") == 0)
 				prompt = false;

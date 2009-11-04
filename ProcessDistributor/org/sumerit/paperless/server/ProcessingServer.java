@@ -2,6 +2,7 @@ package org.sumerit.paperless.server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -39,8 +40,13 @@ public abstract class ProcessingServer extends Thread
 				// Receive command
 				DistributedLogger.debug("SERVER:: Receiving command");
 				final RPCCommand command = new RPCCommand();
-				DataInputStream is = new DataInputStream(socket.getInputStream());			
-				command.readFrom(is);
+				DataInputStream is = new DataInputStream(socket.getInputStream());
+				try {
+					command.readFrom(is);
+				} catch (EOFException e)
+				{
+					return;
+				}
 							
 				// Pass handling of command to function
 				DistributedLogger.debug("SERVER:: Handling request");
@@ -130,14 +136,20 @@ public abstract class ProcessingServer extends Thread
 	
 	protected void listen() throws IOException
 	{				
-		while(poll)
+		while(this.poll)
 		{
 			// Blocks
-			Socket listeningSocket = listeningConnector.accept();			
+			Socket listeningSocket = listeningConnector.accept();
+			
+			if (!this.poll)
+				break;
+			
 			DistributedLogger.debug("SERVER:: Connection accepted");
 			
 			ConnectionHandler handler = new ConnectionHandler(listeningSocket, this.errListener);
 		}		
+		
+		this.listeningConnector.close();
 	}
 
 	@Override
@@ -154,7 +166,12 @@ public abstract class ProcessingServer extends Thread
 	
 	public void interrupt()
 	{		
-		this.poll = false;		
+		this.poll = false;	
+		try {
+			this.listeningConnector.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		super.interrupt();
 	}
 }

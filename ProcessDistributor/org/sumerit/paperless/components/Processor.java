@@ -13,6 +13,8 @@ import org.sumerit.paperless.constants.RPCState;
 import org.sumerit.paperless.events.RPCEvent;
 import org.sumerit.paperless.events.RPCListener;
 import org.sumerit.paperless.io.IntWritable;
+import org.sumerit.paperless.io.StringWritable;
+import org.sumerit.paperless.io.Writable;
 import org.sumerit.paperless.logging.DistributedLogger;
 
 public class Processor extends Thread
@@ -41,22 +43,25 @@ public class Processor extends Thread
 	public void callRPC(final String proc, final String args)
 	{
 		DistributedLogger.debug("Making RPC call to function: " + proc);
-		if (this.initiateRPC(proc))
-		{
+		//if (this.initiateRPC(proc))
+		//{
 			DistributedLogger.debug("RPC call to function: " + proc + " accepted!");
-			RPCEvent e = new RPCEvent(this.invokeRPC(RPCCommand.EXECUTE, proc, args));
+			RPCEvent e = new RPCEvent(this.invokeRPC(new StringWritable(), RPCCommand.EXECUTE, proc, args));
+			
+			if (e.getReponse() == null)
+				return;
 			
 			if (listeners != null)
 			{
 				for (int i = 0; i < listeners.size(); i++)
 					listeners.elementAt(i).handleEvent(e);
 			}			
-		} 
+		//} 
 	}
 		
 	public boolean initiateRPC(String proc) 
 	{
-		RPCResponse response = invokeRPC(RPCCommand.CHECK_AVAILABLE, proc, "");
+		RPCResponse response = invokeRPC(new IntWritable(), RPCCommand.CHECK_AVAILABLE, proc, "");
 			
 		if (((IntWritable) response.getData()).get() == RPCState.SUCCESS)
 			return true;
@@ -64,7 +69,7 @@ public class Processor extends Thread
 			return false;	
 	}
 	
-	public RPCResponse invokeRPC(int type, String proc, String args)
+	public RPCResponse invokeRPC(Writable T, int type, String proc, String args)
 	{
 		if(this.connector.getSocket() == null || !this.connector.getSocket().isConnected())
 		{
@@ -80,7 +85,7 @@ public class Processor extends Thread
 			// Write command to outgoing socket
 			RPCCommand cmd = new RPCCommand(type, proc, args, listener.getLocalPort());
 			DistributedLogger.debug("Writing command " + cmd.toString() + " to outbound socket");
-			DataOutputStream os = new DataOutputStream(this.connector.getOutputStream());								
+			DataOutputStream os = this.connector.getOutputStream();								
 			
 			cmd.write(os);			
 			os.flush();
@@ -89,7 +94,7 @@ public class Processor extends Thread
 			Socket localSocket = listener.accept();
 			
 			// Read back response
-			RPCResponse response = new RPCResponse(new IntWritable());
+			RPCResponse response = new RPCResponse(T);
 			DataInputStream is = new DataInputStream(localSocket.getInputStream());			
 			response.readFrom(is);
 								
@@ -99,11 +104,17 @@ public class Processor extends Thread
 			
 			return response;
 		} catch (IOException e) {
-			DistributedLogger.fatal("Processor::initiateRPC(): Could not connect to host (IO Exception): " + e.getMessage());
+			DistributedLogger.fatal("Processor::invokeRPC(): Could not connect to host (IO Exception): " + e.getMessage());
+			e.printStackTrace();
 			return null;
 		} catch (Exception e) {
-			DistributedLogger.fatal("Processor::initiateRPC(): Could not connect to host (Unknown Exception): " + e.getMessage());
+			DistributedLogger.fatal("Processor::invokeRPC(): Could not connect to host (Unknown Exception): " + e.getMessage());
+			e.printStackTrace();
 			return null;
 		}
+	}
+
+	public void disconnect() {
+		this.connector.disconnect();		
 	}	
 }

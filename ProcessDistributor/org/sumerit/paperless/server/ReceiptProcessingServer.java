@@ -54,7 +54,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 
 	public Writable execute(String proc, String args) 
 	{
-		String[] argv = args.split(" ");
+		String[] argv = args.split("\n");
 		if (proc.compareTo("processReceipt") == 0)
 		{
 			return this.processReceipt(argv[0]);

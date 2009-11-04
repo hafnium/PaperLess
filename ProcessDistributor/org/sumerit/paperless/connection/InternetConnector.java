@@ -21,10 +21,14 @@ public abstract class InternetConnector
 {
 	protected Socket socket = null;
 	
-	protected OutputStream out = null;
+	protected DataOutputStream out = null;
 	
 	protected ServerSocket listeningSocket = null;
 	protected RPCResponse rpcResponse;
+
+	private String hostname;
+
+	private int port;
 	
 	public abstract int getPort();
 	
@@ -47,7 +51,16 @@ public abstract class InternetConnector
 			this.out.close();
 	}
 	
-	public boolean connect(String hostname, int port) 
+	public boolean connect(String hostname, int port)
+	{
+		this.hostname = hostname;
+		this.port = port;
+		
+		//return true;
+		return this.connect();
+	}
+	
+	private boolean connect() 
 	{
 		if (socket != null && socket.isConnected())
 		{
@@ -59,7 +72,7 @@ public abstract class InternetConnector
 			DistributedLogger.debug("Connecting to " + hostname + ":" + port);
 			
 			socket = new Socket(hostname, port);
-			this.out = socket.getOutputStream();
+			this.out = new DataOutputStream(socket.getOutputStream());
 			
 			DistributedLogger.debug("Connected!");
 		} catch (UnknownHostException e) {
@@ -77,7 +90,7 @@ public abstract class InternetConnector
 
 	public boolean disconnect() 
 	{
-		if (!socket.isConnected())
+		if (socket == null || !socket.isConnected())
 		{
 			DistributedLogger.warning("HttpConnector::disconnect(): Client not connected to server");
 			return false;
@@ -99,10 +112,13 @@ public abstract class InternetConnector
 		return true;
 	}
 	
-	public OutputStream getOutputStream()
+	public DataOutputStream getOutputStream()
 	{
+		this.disconnect();
+		this.connect();
 		return this.out;
 	}
+	
 	public Socket getSocket()
 	{
 		return this.socket;
