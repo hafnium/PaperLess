@@ -13,16 +13,11 @@ public class Location
 		cityId = "";
 	}
 	
-	public Location(String locationId, String storeId, String cityId)
+	public Location(String storeId, String cityId)
 	{
-		this.locationId = locationId;
+		this.locationId = "";
 		this.storeId = storeId;
 		this.cityId = cityId;
-	}
-	
-	public void setLocationId(String locationId)
-	{
-		this.locationId = locationId;
 	}
 	
 	public void setStoreId(String storeId)

@@ -13,16 +13,11 @@ public class Item
 		locationId = "";
 	}
 	
-	public Item(String itemId, String name, String locationId)
+	public Item(String name, String locationId)
 	{
-		this.itemId = itemId;
+		this.itemId = null;
 		this.name = name;
 		this.locationId = locationId;
-	}
-	
-	public void setItemId(String itemId)
-	{
-		this.itemId = itemId;
 	}
 	
 	public void setName(String name)
