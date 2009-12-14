@@ -1,1 +1,100 @@
+%\documentclass[final]{acmsiggraph}       % final
+\documentclass[review]{acmsiggraph}      % review
+%\documentclass[widereview]{acmsiggraph}  % wide-spaced review
+%\documentclass[preprint]{acmsiggraph}    % preprint
+%\documentclass[draft]{acmsiggraph}    % preprint
+
+%% Uncomment one of the four lines above depending on where your paper is
+%% in the conference process. ``review'' and ``widereview'' are for review
+%% submission, ``preprint'' is for pre-publication, and ``final'' is for
+%% the version to be printed.
+
+%% The 'helvet' and 'times' packages define the typefaces used for
+%% serif and sans serif type in this document. Computer Modern Roman 
+%% is used for mathematics typesetting. The scale factor is set to .92
+%% to bring the sans-serif type in line with the serif type.
+
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{parskip}
+\usepackage{fancyvrb}
+\usepackage{tabularx}
+\usepackage{rotating}
+\usepackage{calc}
+
+\newcommand{\IText}[2]{   % #1=Image, #2=Text 2
+%  \mbox{#1\hspace{.5\baselineskip}} 
+  \begin{turn}{90}
+    \parbox{\heightof{#1}}{\centering#2}
+  \end{turn}
+}
+
+\newcommand{\Rn}[1]{{\mathbb R}^{#1}}
+\newcommand{\vect}[1]{\boldsymbol{\mathrm{#1}}}
+\newcommand{\mat}[1]{\mathrm{\mathbf{#1}}}
+\newcommand{\trans}[1]{#1^{\mathrm{T}}}
+\newcommand{\pinv}[1]{#1^\dagger}
+\newcommand{\vectt}[1]{\trans{\vect{#1}}}
+\newcommand{\trace}[1]{\mathrm{Tr}(#1)}
+\newcommand{\ignore}[1]{}
+\newcommand{\remark}[1]{\emph{\color{red}#1}}
+\newcommand{\x}{\vect{x}}
+\newcommand{\y}{\vect{y}}
+\renewcommand{\H}{\mat{H}}
+\renewcommand{\v}{\vect{\nu}}
+\newcommand{\xhat}{\hat{\x}}
+\newcommand{\Id}{\mat{I}}
+\newcommand{\sigmav}{\sigma_{\v}}
+\renewcommand{\t}{\vect{\theta}}
+\newcommand{\NN}{\mathrm{NN}}
+\def\placeholder#1#2{\fbox{\vbox to #2{\vss\hbox to #1{\hss~}\vss}}}
+
+\onlineid{}
+
+\title{\vspace{-5mm}}
+
+\author{}
+
+\keywords{}
+
+\begin{document}
+
+\maketitle
+
+\input{abstract}
+
+%% ACM Computing Review (CR) categories. 
+%% See <http://www.acm.org/class/1998/> for details.
+%% The ``\CRcat'' command takes four arguments.
+
+%\begin{CRcatlist}
+%\end{CRcatlist}
+
+%% The ``\keywordlist'' command prints out the keywords.
+% \keywordlist
+
+%\copyrightspace
+
+\input{intro}
+
+\input{requirements}
+
+\input{system}
+
+\input{results}
+
+\input{discussion}
+
+\input{future}
+
+\input{conclusion}
+
+\bibliographystyle{acmsiggraph}
+\bibliography{paper}
+
+\end{document}
 \package{}
