@@ -2,5 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry exported="true" kind="lib" path="/net/af21/wb3b/workspace/PaperLess/HBaseHandler/mysql-connector-java-3.0.17-ga/mysql-connector-java-3.0.17-ga-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

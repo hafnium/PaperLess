@@ -15,10 +15,10 @@ public class Receipt
 		date = "";
 	}
 	
-	public Receipt(String userId, String receiptId, String receiptNumber, String date)
+	public Receipt(String userId, String receiptNumber, String date)
 	{
 		this.userId = userId;
-		this.receiptId = receiptId;
+		this.receiptId = "";
 		this.receiptNumber = receiptNumber;
 		this.date = date;
 	}
@@ -26,11 +26,6 @@ public class Receipt
 	public void setUserId(String userId)
 	{
 		this.userId = userId;
-	}
-	
-	public void setReceiptId(String receiptId)
-	{
-		this.receiptId = receiptId;
 	}
 	
 	public void setReceiptNumber(String receiptNumber)

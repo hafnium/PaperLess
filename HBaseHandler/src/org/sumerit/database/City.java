@@ -15,17 +15,12 @@ public class City
 		zip = "";
 	}
 	
-	public City(String cityId, String city, String state, String zip)
+	public City(String city, String state, String zip)
 	{
-		this.cityId = cityId;
+		this.cityId = null;
 		this.city = city;
 		this.state = state;
 		this.zip = zip;
-	}
-	
-	public void setCityId(String cityId)
-	{
-		this.cityId = cityId;
 	}
 	
 	public void setCity(String city)
