@@ -16,28 +16,6 @@ public class ReceiptProcessingServer extends ProcessingServer
 	}	
 	*/
 	
-	private class SQLCommand
-	{
-		private String sql;
-		private final String dbname;
-		
-		public SQLCommand(String dbname)
-		{
-			this.dbname = dbname;
-			this.sql = "";
-		}
-		
-		public void addItem(String name, float cost)
-		{
-			sql += "INSERT INTO " + dbname + " itemName, itemCost VALUES('" + name + "', " + cost + ");";
-		}
-		
-		public String get()
-		{
-			return this.sql;
-		}
-	};
-	
 	public ReceiptProcessingServer(InternetConnector connector) 
 	{
 		super(connector);
@@ -66,30 +44,16 @@ public class ReceiptProcessingServer extends ProcessingServer
 	
 	public Writable processReceipt(String receipt)
 	{
-		SQLCommand sql = new SQLCommand("receipts");
-		
+		String SQL = "";
 		ReceiptParser parser = new ReceiptParser(receipt);
-			
-		sql.addItem(parser.getItemName(), Float.parseFloat(parser.getPrice()));
+		//ReceiptDatum = ocrImage(receipt);
 		
-		//System.out.println(ocrImage("World"));
+		/** TODO: Write code to extract relevant bits from the parser and save them to the database
+		 * At the end of this, there should be a String that contains a concatenated list of all 
+		 * SQL statements that were executed during this process.
+		 */
 		
-		return new StringWritable(sql.get());
-	}
-	
-	public static String[] testProcessReceipt(String receipt)
-	{
-		ReceiptParser parser = new ReceiptParser(receipt);
-		String[] res = new String[6];
-		
-		res[0] = parser.getItemName();
-		res[1] = parser.getStore();
-		res[2] = parser.getStoreLocation()[0] + ", " + parser.getStoreLocation()[1] + " " + parser.getStoreLocation()[2];
-		res[3] = parser.getUser();
-		res[4] = parser.getQuantity();
-		res[5] = parser.getPrice();
-		
-		return res;
+		return new StringWritable(SQL);
 	}
 
 }

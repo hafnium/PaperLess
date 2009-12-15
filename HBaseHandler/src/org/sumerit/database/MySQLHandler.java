@@ -1,4 +1,4 @@
-package src;
+package org.sumerit.database;
 
 import java.math.BigInteger;
 import java.sql.Connection;
@@ -7,20 +7,16 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.security.*;
 import java.util.ArrayList;
-import java.util.Hashtable;
-
-import com.jcraft.jsch.*;
 
 public class MySQLHandler 
 {
 	private Statement stmt;
 	private ResultSet rs;
-	private String url = "jdbc:mysql://127.0.0.1:3307/Paperless";
-	private String user = "root";
-	private String pass = "NO-fx!";
+	private String url = "jdbc:mysql://76.120.194.253:3306/Paperless";
+	private String user = "sean";
+	private String pass = "test";
 	private Connection con = null;
 	private MessageDigest digest = null;
-	private Session session = null;
 	
 	public MySQLHandler( )
 	{
@@ -28,27 +24,7 @@ public class MySQLHandler
 	}
 	
 	public void connect( )
-	{
-		try {
-		  final JSch jsch = new JSch();
-		  session = jsch.getSession("wil", "76.120.194.253", 22);
-
-		  final Hashtable<String, String> config = new Hashtable<String, String>();
-		  config.put("StrictHostKeyChecking", "no");
-		  session.setConfig(config);
-		  jsch.addIdentity("/home/wil/.ssh/id_dsa");
-		  //jsch.addIdentity("~/wil/.ssh/id_dsa");
-
-		  session.connect();
-
-		  int assigned_port = session.setPortForwardingL(3307, "76.120.194.253", 3306);
-
-		} catch (Exception e) {
-		  e.printStackTrace();
-		  System.exit(-1);
-		}    
-
-		
+	{  	
 		// Establish Connection With Database
 		try 
 		{
@@ -69,7 +45,6 @@ public class MySQLHandler
 		try
 		{
 			con.close( );
-			session.disconnect();
 		}
 		catch( Exception e ) 
 		{

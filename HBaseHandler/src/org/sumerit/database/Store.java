@@ -1,4 +1,4 @@
-package src;
+package org.sumerit.database;
 
 public class Store 
 {
