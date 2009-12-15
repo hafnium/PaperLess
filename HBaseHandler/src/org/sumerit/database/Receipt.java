@@ -1,4 +1,4 @@
-package org.sumerit.database;
+package src;
 
 public class Receipt
 {
@@ -19,6 +19,14 @@ public class Receipt
 	{
 		this.userId = userId;
 		this.receiptId = "";
+		this.receiptNumber = receiptNumber;
+		this.date = date;
+	}
+	
+	public Receipt(String receiptId, String userId, String receiptNumber, String date)
+	{
+		this.userId = userId;
+		this.receiptId = receiptId;
 		this.receiptNumber = receiptNumber;
 		this.date = date;
 	}

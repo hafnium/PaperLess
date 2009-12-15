@@ -1,4 +1,4 @@
-package org.sumerit.database;
+package src;
 
 public class Location
 {
@@ -16,6 +16,13 @@ public class Location
 	public Location(String storeId, String cityId)
 	{
 		this.locationId = "";
+		this.storeId = storeId;
+		this.cityId = cityId;
+	}
+	
+	public Location(String locationId, String storeId, String cityId)
+	{
+		this.locationId = locationId;
 		this.storeId = storeId;
 		this.cityId = cityId;
 	}

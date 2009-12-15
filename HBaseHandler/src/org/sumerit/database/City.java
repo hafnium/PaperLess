@@ -1,4 +1,4 @@
-package org.sumerit.database;
+package src;
 
 public class City
 {
@@ -18,6 +18,14 @@ public class City
 	public City(String city, String state, String zip)
 	{
 		this.cityId = null;
+		this.city = city;
+		this.state = state;
+		this.zip = zip;
+	}
+	
+	public City(String cityId, String city, String state, String zip)
+	{
+		this.cityId = cityId;
 		this.city = city;
 		this.state = state;
 		this.zip = zip;

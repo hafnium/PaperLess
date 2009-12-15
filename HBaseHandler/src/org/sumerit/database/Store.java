@@ -1,4 +1,4 @@
-package org.sumerit.database;
+package src;
 
 public class Store 
 {
@@ -16,6 +16,13 @@ public class Store
 	public Store(String name, String address)
 	{
 		this.storeId = "";
+		this.name = name;
+		this.address = address;
+	}
+	
+	public Store(String storeId, String name, String address)
+	{
+		this.storeId = storeId;
 		this.name = name;
 		this.address = address;
 	}

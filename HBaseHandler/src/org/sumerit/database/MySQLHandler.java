@@ -1,6 +1,5 @@
 package src;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,67 +7,124 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.security.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Hashtable;
 
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Scanner;
-import org.apache.hadoop.hbase.io.BatchUpdate;
-import org.apache.hadoop.hbase.io.Cell;
-import org.apache.hadoop.hbase.io.RowResult;
-import org.apache.hadoop.hbase.util.Bytes;
+import com.jcraft.jsch.*;
 
-public class HBaseHandler 
+public class MySQLHandler 
 {
+	private Statement stmt;
+	private ResultSet rs;
+	private String url = "jdbc:mysql://127.0.0.1:3307/Paperless";
+	private String user = "root";
+	private String pass = "NO-fx!";
 	private Connection con = null;
 	private MessageDigest digest = null;
+	private Session session = null;
 	
-	private HBaseConfiguration config = null;
-	private HTable table = null;
-	private Scanner scanner = null;
-	
-	public HBaseHandler( )
+	public MySQLHandler( )
 	{
-		try
-		{
-			// You need a configuration object to tell the client where to connect.
-			// But don't worry, the defaults are pulled from the local config file.
-			config = new HBaseConfiguration( );
-		}
-		catch(IOException IOE)
-		{
-			System.out.println("Initialization Error.");
-		}
+		
 	}
 	
 	public void connect( )
 	{
+		try {
+		  final JSch jsch = new JSch();
+		  session = jsch.getSession("wil", "76.120.194.253", 22);
+
+		  final Hashtable<String, String> config = new Hashtable<String, String>();
+		  config.put("StrictHostKeyChecking", "no");
+		  session.setConfig(config);
+		  jsch.addIdentity("/home/wil/.ssh/id_dsa");
+		  //jsch.addIdentity("~/wil/.ssh/id_dsa");
+
+		  session.connect();
+
+		  int assigned_port = session.setPortForwardingL(3307, "76.120.194.253", 3306);
+
+		} catch (Exception e) {
+		  e.printStackTrace();
+		  System.exit(-1);
+		}    
+
 		
+		// Establish Connection With Database
+		try 
+		{
+			//Register the JDBC driver for MySQL.
+		    Class.forName("com.mysql.jdbc.Driver");
+
+		    //Get a connection to the database
+		    con = DriverManager.getConnection(url, user, pass);	
+		}
+		catch( Exception e ) 
+		{
+			e.printStackTrace();
+	    }//end catch
 	}
 	
 	public void disconnect( )
 	{
-		
+		try
+		{
+			con.close( );
+			session.disconnect();
+		}
+		catch( Exception e ) 
+		{
+			e.printStackTrace();
+	    }//end catch
 	}
 	
 	public void addUser(User toAdd)
 	{
-		// This instantiates an HTable object that connects you to the "myTable"
-		// table. 
-		table = new HTable(config, "myTable");
-//		 Storing data
-		long writeid = table.startUpdate(row);
-		table.put(writeid, columnName1, bytes);
-		table.put(writeid, columnName2, bytes);
-		table.delete(writeid, columnName3);
-		table.commit(writeid);
-//		 Reading data
-		byte[] data = table.get(row, columnName1);
+		connect( );
+		try
+		{
+			// Create a stmt object
+			stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
+			//Query the database, storing the result
+			// in an object of type ResultSet
+			rs = stmt.executeQuery("SELECT * from User WHERE " +
+					"FirstName='" + toAdd.getFirstName( ) + "' AND " +
+					"LastName='" + toAdd.getLastName( ) + "' AND " +
+					"Email='" + toAdd.getEmail( ) + "'");
+			
+
+			// Check if User is already in the database
+			while(rs.next())
+			{
+				System.out.println("User already exists in DB.");
+				disconnect( );
+				return;
+			}//end while loop
+
+			digest = MessageDigest.getInstance("MD5");
+			byte[] byteArray = toAdd.getPassword( ).getBytes();
+			digest.update(byteArray);
+			//digest.digest( );
+			byte[] md5sum = digest.digest();
+			BigInteger bigInt = new BigInteger(1, md5sum);
+			String md5 = bigInt.toString(16);
+						
+			stmt.executeUpdate("INSERT INTO User(FirstName, LastName, Email, " +
+					"Password) VALUES ('" + toAdd.getFirstName( ) + "', '" +
+					toAdd.getLastName( ) + "', '" + toAdd.getEmail( ) + "', '" + 
+					md5 + "')"); 
+		}
+		catch( Exception e ) 
+		{
+			e.printStackTrace();
+	    }//end catch
+		finally
+		{
+			disconnect( );
+		}
 	}
 	
-/*	public void addStore(Store toAdd)
+	public void addStore(Store toAdd)
 	{
 		connect( );
 		try
@@ -536,11 +592,11 @@ public class HBaseHandler
 			disconnect( );
 		}
 		return toReturn;
-	}*/
+	}
 	
 	public static void main(String [] args)
 	{
-		HBaseHandler handler = new HBaseHandler( );
+		MySQLHandler handler = new MySQLHandler( );
 		
 		// Create data structures to be added to DB
 		User user = new User("Wil", "Burns", "wb3b@virginia.edu", "password");
@@ -556,7 +612,7 @@ public class HBaseHandler
 		
 		// Perform inserts
 		handler.addUser(user);
-/*		handler.addCity(city);
+		handler.addCity(city);
 		handler.addStore(store);
 		handler.addLocation(location);
 		handler.addItem(item1);
@@ -565,13 +621,13 @@ public class HBaseHandler
 		handler.addLine(line1);
 		handler.addLine(line2);
 		handler.addLine(line3);
-		handler.addReceipt(new Receipt("2", "1", "2009-12-07"));*/
+		handler.addReceipt(new Receipt("1", "1", "2009-12-07"));
 		
-		//user = handler.getUser("wb3b@virginia.edu");
+		user = handler.getUser("wb3b@virginia.edu");
 		System.out.println("User Id: " + user.getUserId( ));
 		
 		// Print user's receipt list
-		/*ArrayList <Receipt> receipts = handler.getReceipts(user);
+		ArrayList <Receipt> receipts = handler.getReceipts(user);
 		for(Receipt toPrint : receipts)
 		{
 			System.out.println("Receipt id:" + toPrint.getReceiptId( ));
@@ -581,6 +637,6 @@ public class HBaseHandler
 				Item item = handler.getItem(line);
 				System.out.println("Item: " + item.getName( ) + " Price: " + line.getPrice( ) + " Quantity: " + line.getQuantity( ));
 			}
-		}*/
+		}
 	}
 }

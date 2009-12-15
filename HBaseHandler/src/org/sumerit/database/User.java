@@ -1,4 +1,4 @@
-package org.sumerit.database;
+package src;
 
 public class User 
 {
@@ -20,6 +20,15 @@ public class User
 	public User(String firstName, String lastName, String email, String password)
 	{
 		this.userId = "";
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.password = password;
+	}
+	
+	public User(String userId, String firstName, String lastName, String email, String password)
+	{
+		this.userId = userId;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
