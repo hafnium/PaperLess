@@ -1,12 +1,10 @@
 package org.sumerit.paperless.test;
 
 import java.util.Scanner;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 
 import org.sumerit.paperless.components.Processor;
 import org.sumerit.paperless.connection.HttpConnector;
-import org.sumerit.paperless.connection.InternetConnector;
 import org.sumerit.paperless.events.ExceptionListener;
 import org.sumerit.paperless.events.RPCEvent;
 import org.sumerit.paperless.events.RPCListener;

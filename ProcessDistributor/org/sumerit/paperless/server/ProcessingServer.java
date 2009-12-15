@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 import org.sumerit.paperless.components.RPCCommand;
@@ -28,7 +27,6 @@ public abstract class ProcessingServer extends Thread
 		{
 			this.socket = socket;
 			this.errListener = errListener;
-			this.start();
 		}
 		
 		public void run()
@@ -149,6 +147,7 @@ public abstract class ProcessingServer extends Thread
 			DistributedLogger.debug("SERVER:: Connection accepted");
 			
 			ConnectionHandler handler = new ConnectionHandler(listeningSocket, this.errListener);
+			handler.start();
 		}		
 		
 		this.listeningConnector.close();

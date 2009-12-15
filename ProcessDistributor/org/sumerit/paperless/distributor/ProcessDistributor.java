@@ -13,6 +13,7 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Vector;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import org.sumerit.paperless.components.Processor;
 import org.sumerit.paperless.connection.HttpConnector;
@@ -27,39 +28,48 @@ import org.sumerit.paperless.logging.DistributedLogger;
  */
 public class ProcessDistributor extends Thread
 {	
-	private class ConnectionHandler extends Thread
+	private class ProcessCreator extends Thread
 	{
 		private String hostname;
-		private Socket sock;
+		private StringWritable receipt;
 		private Vector<RPCListener> listeners;
 		
-		public ConnectionHandler(Socket sock, String hostname, Vector<RPCListener> listeners)
+		public ProcessCreator(StringWritable receipt, String hostname, Vector<RPCListener> listeners)
 		{
 			this.hostname = hostname;
-			this.sock = sock;
+			this.receipt = receipt;
 			this.listeners = listeners;
-			this.start();
 		}
-		
-		public void noop() {}
 		
 		public void run()
 		{
-			StringWritable receipt = new StringWritable();
-			try {
-				InputStream is = sock.getInputStream();
-				receipt.readFrom(new DataInputStream(is));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
 			Processor P = new Processor(new HttpConnector());			
 			if (this.listeners != null)
 				P.addListeners(this.listeners);
 			P.start();
-			P.connect(this.hostname);
+			if (!P.connect(this.hostname)) {
+				receiptQueue.add(receipt);
+				return;
+			}
 			P.callRPC("processReceipt", receipt.get());
 			P.disconnect();
+			
+			incrReceiptsProcessed();
+		}
+	}
+	
+	private class QueuePoller extends Thread
+	{
+		public void run()
+		{
+			while(true)
+			{
+				if (!receiptQueue.isEmpty())
+				{
+					ProcessCreator P = new ProcessCreator(receiptQueue.poll(), getNextAvailableServer(), rpcListeners);
+					P.start();
+				}
+			}
 		}
 	}
 	
@@ -72,6 +82,11 @@ public class ProcessDistributor extends Thread
 	private static final String killHash = "4078a7f2c5a9f82a77f9bb7bd98aae58";
 	
 	private Vector<RPCListener> rpcListeners;
+	
+	private ArrayBlockingQueue<StringWritable> receiptQueue;
+	private QueuePoller queuePoller;
+	
+	private int receiptsProcessed;
 	
 	private boolean poll;
 	
@@ -90,6 +105,9 @@ public class ProcessDistributor extends Thread
 		}
 		
 		poll = true;
+		receiptQueue = new ArrayBlockingQueue<StringWritable>(100);
+		queuePoller = new QueuePoller();
+		queuePoller.start();
 	}
 	
 	public void addListener(RPCListener L)
@@ -114,6 +132,12 @@ public class ProcessDistributor extends Thread
 		return ret;
 	}
 	
+	private synchronized void incrReceiptsProcessed()
+	{
+		receiptsProcessed++;
+		DistributedLogger.info("Processed " + receiptsProcessed + " receipts");
+	}
+	
 	public void run()
 	{
 		while(poll)
@@ -134,8 +158,15 @@ public class ProcessDistributor extends Thread
 			
 			DistributedLogger.debug("GATEWAY:: Receipt coming through...");
 			
-			ConnectionHandler handler = new ConnectionHandler(handlingSocket, this.getNextAvailableServer(), this.rpcListeners);	
-			handler.noop();
+			StringWritable receipt = new StringWritable();
+			try {
+				InputStream is = handlingSocket.getInputStream();
+				receipt.readFrom(new DataInputStream(is));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			this.receiptQueue.add(receipt);
 		}
 	}
 	

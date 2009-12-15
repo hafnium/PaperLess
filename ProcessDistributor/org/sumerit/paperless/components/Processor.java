@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -20,7 +19,6 @@ import org.sumerit.paperless.logging.DistributedLogger;
 
 public class Processor extends Thread
 {	
-	private static int connCount = 0;
 	private InternetConnector connector;
 	
 	private Vector<RPCListener> listeners;

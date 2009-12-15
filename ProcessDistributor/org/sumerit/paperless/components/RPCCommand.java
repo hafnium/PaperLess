@@ -3,7 +3,6 @@ package org.sumerit.paperless.components;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 
 import org.sumerit.paperless.io.Writable;
 

@@ -35,7 +35,7 @@ public class TestSubmitter
 				str.write(new DataOutputStream(sock.getOutputStream()));
 				sock.close();
 				
-				Thread.sleep(1000);
+				Thread.sleep(10);
 			}
 		} catch (UnknownHostException e) {
 			e.printStackTrace();

@@ -1,4 +1,4 @@
-10
+36
 Orange 0.89
 Banana 0.59
 Mango 1.24
@@ -9,3 +9,29 @@ Carrots 1.99
 Endives 2.39
 Saffron 9.99
 Shitake 3.10
+Artichoke 2.34
+Asparagus 2.34
+Aubergene 2.56
+Beans 7.65
+Beets 1.23
+Broccoli 2.32
+Cabbage 21.30
+Carrot 4.32
+Cauliflower 8.76
+Celeriac 9.09
+Celery 4.30
+Chard 1.20
+Chicory 2.30
+Collards 4.50
+Corn 6.53
+Cress 1.25
+Cucumbers 1.67
+Gourd 1.45
+Kale 2.31
+Kohlrabi 4.54
+Leek 5.23
+Lettuce 1.11
+Melons 1.23
+Mushrooms 2.34
+Okra 2.54
+Onions 1.23
