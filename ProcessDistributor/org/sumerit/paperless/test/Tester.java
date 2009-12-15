@@ -36,11 +36,18 @@ public class Tester implements ExceptionListener, RPCListener {
 		
 		if(true)
 		{
+			System.out.println("Starting local server...");			
 			server.start();
+			
+			System.out.println("Connecting to local server...");
 			P.connect("localhost");
+			
+			System.out.println("Processing some test receipts...");
 			P.callRPC("processReceipt", "Orange 1.02");
 			P.callRPC("processReceipt", "Apple 2.02");
 		}			
+		
+		printHelp();
 		
 		boolean prompt = true;
 		while (prompt)
@@ -60,6 +67,12 @@ public class Tester implements ExceptionListener, RPCListener {
 			if (choice.matches("disconnect"))
 				P.disconnect();
 			
+			if (choice.matches("verbose"))
+				DistributedLogger.setLevel(Level.ALL);
+			
+			if (choice.matches("terse"))
+				DistributedLogger.setLevel(Level.OFF);
+			
 			if (choice.matches("rpc [^ ]* .*"))
 				P.callRPC(choice.split(" ")[1], choice.split("\"")[1]);		
 			
@@ -78,11 +91,12 @@ public class Tester implements ExceptionListener, RPCListener {
 	public static void printHelp()
 	{
 		System.out.println("Available Commands\n--------------------------------------\n");
-		System.out.println("\tstart server\t\t - start a recipt processing server locally");
-		System.out.println("\tstop server\t\t - stop the local recipt processing server");
-		System.out.println("\tconnect <hostname>\t - connect to the processing server at <hostname>");
-		System.out.println("\trpc <procedure>\t\t - make an RPC of type <procedure>");
-		System.out.println("\tquit\t\t\t - quit this program");
+		System.out.println("\tstart server\t\t\t\t  - start a recipt processing server locally");
+		System.out.println("\tstop server\t\t\t\t  - stop the local recipt processing server");
+		System.out.println("\tconnect <hostname>\t\t\t  - connect to the processing server at <hostname>");
+		System.out.println("\tdisconnect\t\t\t\t  - disconnect from server");
+		System.out.println("\trpc <procedure> \"<item name> <item cost>\" - make an RPC of type <procedure>");
+		System.out.println("\tquit\t\t\t\t\t  - quit this program");
 	}
 	
 	@Override

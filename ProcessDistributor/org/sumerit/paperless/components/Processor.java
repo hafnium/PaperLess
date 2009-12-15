@@ -18,7 +18,7 @@ import org.sumerit.paperless.io.Writable;
 import org.sumerit.paperless.logging.DistributedLogger;
 
 public class Processor extends Thread
-{
+{	
 	private static int connCount = 0;
 	private InternetConnector connector;
 	
