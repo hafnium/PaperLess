@@ -63,14 +63,20 @@
             <classpath refid="ProcessDistrbutor.classpath"/>
         </java>
     </target>
+    <target name="TestServer">
+        <java classname="org.sumerit.paperless.test.TestServer" failonerror="true" fork="yes">
+            <classpath refid="ProcessDistrbutor.classpath"/>
+        </java>
+    </target>
     <target name="TestSubmitter">
         <java classname="org.sumerit.paperless.test.TestSubmitter" failonerror="true" fork="yes">
             <arg line="localhost testCases.txt"/>
             <classpath refid="ProcessDistrbutor.classpath"/>
         </java>
     </target>
-    <target name="TestServer">
-        <java classname="org.sumerit.paperless.test.TestServer" failonerror="true" fork="yes">
+    <target name="TestReceiptParser">
+        <java classname="org.sumerit.paperless.test.TestReceiptParser" failonerror="true" fork="yes">
+            <arg line="testCases.txt"/>
             <classpath refid="ProcessDistrbutor.classpath"/>
         </java>
     </target>
