@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Vector;
 
 import org.sumerit.paperless.connection.InternetConnector;
@@ -38,6 +39,13 @@ public class Processor extends Thread
 	public void addListener(RPCListener L)
 	{
 		this.listeners.add(L);
+	}
+	
+	public void addListeners(Vector<RPCListener> L)
+	{
+		Iterator<RPCListener> iter = L.iterator();
+		while(iter.hasNext())
+			this.listeners.add(iter.next());
 	}
 	
 	public void callRPC(final String proc, final String args)

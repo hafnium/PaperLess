@@ -22,7 +22,7 @@ public class Tester implements ExceptionListener, RPCListener {
 	public static void main(String[] args) 
 	{
 		Tester T = new Tester();
-		DistributedLogger.setLevel(Level.OFF);
+		DistributedLogger.setLevel(Level.ALL);
 		//DistributedLogger.redirectOutput(new ConsoleHandler());	
 		
 		ReceiptProcessingServer server = new ReceiptProcessingServer(new HttpConnector());

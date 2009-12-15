@@ -9,6 +9,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import org.sumerit.paperless.components.RPCCommand;
@@ -38,7 +39,15 @@ public abstract class InternetConnector
 			listeningSocket = new ServerSocket(this.getPort());
 		
 		// BLOCKS
-		return listeningSocket.accept();
+		Socket ret = null;
+		try {
+			ret = listeningSocket.accept();
+		} catch (SocketException e)
+		{
+			DistributedLogger.warning("Socket closed");
+		}
+		
+		return ret; 
 	}
 	
 	public void close() throws IOException

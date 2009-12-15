@@ -1,5 +1,56 @@
 \section{System Overview}
 
+\subsection{Receipt Processing}
+
+Central to our approach is the issue of scalability. The vision of our
+system is that it will able to efficiently and reliably serve many
+millions of requests with little or no degradation of service. As
+such, our design reflects an attempt to minimize possible downtime
+and/or degradation of service. Our approach is twofold. First, we have
+designed our system to be redundant. If any particular subsystem is
+faulty for any reason, then our entire system is able to adapt and use
+other resources to ``fill in the gap.'' Second, we are aware that even
+a redundant system cannot always satisfy the needs of a growing number
+of requests. This has led us to design our system to scale well as our
+demand increases. 
+
+Figure~\ref{fig:overview} is an overview of our system. The entry
+point to the entire processing portion is the gateway. All receipt
+requests arrive at the gateway. From there, our ProcessDistributor
+attempts to schedule the receipt to be processed by a particular
+ProcessingServer. Each receipt is assigned its own thread that will be
+responsible for communicating with a particular server during its
+processing. The threads themselves are designed to be lightweight and
+completely independent. This allows the gateway to handle a large
+number of receipts at once. Although this puts a critical confidence
+in the gateway servers, we are able to provide redundancy and
+scalability by using a simple scheme that uses DNS to choose an
+alternative gateway if one goes down or to simply add a new one to the
+pool if demand is higher.
+
+The distributor attempts to load-balance by keeping a list of recently
+scheduled jobs for each server. If a server does not respond to the
+request, it is put on a blacklist and another server is used
+instead. Periodically the distributor will check its blacklist to see
+if any of those servers have come back online. All of the computation
+for involved in processing a receipt happens on a remote
+ProcessingServer. The servers are just drones that poll their
+listening socket for any incoming connection, and process a receipt
+when a connection is made.
+
+The processing path of the system is a simple remote procedure call
+architecture. The Process threads on the ProcessDistributor issue
+RPC's to a particular ProcessingServer. The RPC invokes a series of
+actions on the remote server. First, the receipt is loaded from a
+distributed file system. Then, an optical character recognition (OCR)
+package is used to convert the receipt (which is just an image) to
+text. The output of the OCR package is a set of lines in ASCII that
+are parsed to extract the purchased items, purchasing authority
+(customer), time and locale information of the purchase, and the
+seller. This information is stored in our data warehouse through a
+simple interface to our distributed mySQL server (see
+Section~\ref{sec:database}).
+
 \remark{Describe the server architecture (RPC, Sockets, etc). Also
 desribe the distributed nature of the whole system. MySQL
 server. Gateway. Redundancy. Basically tie in the information from the

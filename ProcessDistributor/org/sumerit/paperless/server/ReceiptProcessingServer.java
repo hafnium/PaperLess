@@ -9,11 +9,13 @@ import org.sumerit.paperless.io.Writable;
 
 public class ReceiptProcessingServer extends ProcessingServer 
 {
+	/*
 	public native String ocrImage(String imageFilename);
 	
 	static {
 		System.load("/af3/sma2t/local/ocrConnector.so");
 	}	
+	*/
 	
 	private class SQLCommand
 	{
@@ -42,7 +44,6 @@ public class ReceiptProcessingServer extends ProcessingServer
 		super(connector);
 	}
 
-	public static final int LISTENING_PORT = 11128;
 	private static final String[] services = {"processReceipt"};
 	
 	public boolean checkAvailableTypes(String query) 
@@ -51,11 +52,6 @@ public class ReceiptProcessingServer extends ProcessingServer
 			return false;
 		else
 			return true;
-	}
-	
-	protected int getPort()
-	{
-		return ReceiptProcessingServer.LISTENING_PORT;
 	}
 
 	public Writable execute(String proc, String args) 
@@ -83,7 +79,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 			sql.addItem(itemName, itemCost);
 		}
 		
-		System.out.println(ocrImage("World"));
+		//System.out.println(ocrImage("World"));
 		
 		return new StringWritable(sql.get());
 	}

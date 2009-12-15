@@ -112,7 +112,6 @@ public abstract class ProcessingServer extends Thread
 	private boolean poll;	
 	private ExceptionListener errListener;
 	
-	protected abstract int getPort();
 	public abstract boolean checkAvailableTypes(String query);
 	public abstract Writable execute(String proc, String args);
 	
@@ -141,6 +140,9 @@ public abstract class ProcessingServer extends Thread
 			// Blocks
 			Socket listeningSocket = listeningConnector.accept();
 			
+			if (listeningSocket == null)
+				break;
+				
 			if (!this.poll)
 				break;
 			
