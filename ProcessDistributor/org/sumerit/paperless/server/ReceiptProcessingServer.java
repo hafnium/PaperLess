@@ -72,6 +72,9 @@ public class ReceiptProcessingServer extends ProcessingServer
 		String LocationId = parser.getStore( );
 		String UserId = parser.getUser( );
 		String Date = parser.getDate( );
+		if(Quantity.length( ) == 0)
+			Quantity = "1";
+		
 		SQL += addReceipt(UserId, LocationId, Date);
 		SQL += addLine(ReceiptId, ItemName, Price, Quantity);
 					
@@ -102,7 +105,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 				return "Receipt already exists in DB.";
 			}//end while loop
 
-			stmt.executeUpdate("INSERT INTO Receipt(UserId, LocationId, Date) VALUES ('" + 
+			stmt.executeUpdate("INSERT INTO Receipt (UserId, LocationId, Date) VALUES ('" + 
 					UserId + "', '" + LocationId + "', '" + 
 					Date + "')"); 
 		}
@@ -116,7 +119,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 		}
 		return "SELECT * from Receipt WHERE " +	"UserId='" + UserId + "' AND " +
 		"LocationId='" + LocationId + "' AND " +
-		"Date='" + Date + "'\n" + "INSERT INTO Receipt(UserId, LocationId, Date) VALUES ('" + 
+		"Date='" + Date + "'\n" + "INSERT INTO Receipt (UserId, LocationId, Date) VALUES ('" + 
 		UserId + "', '" + LocationId + "', '" + Date + "')\n";
 	}
 	
@@ -145,7 +148,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 				return "Line already exists in DB.";
 			}//end while loop
 
-			stmt.executeUpdate("INSERT INTO Line(ReceiptId, ItemName, Price, Quantity) VALUES ('" +
+			stmt.executeUpdate("INSERT INTO Line (ReceiptId, ItemName, Price, Quantity) VALUES ('" +
 					ReceiptId + "', '" +
 					ItemName + "', '" +
 					Price + "', '" +
@@ -163,7 +166,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 		"ReceiptId='" + ReceiptId + "' AND " +
 		"ItemName='" + ItemName + "' AND " +
 		"Price='" + Price + "' AND " +
-		"Quantity='" + Quantity + "'\n" + "INSERT INTO Line(ReceiptId, ItemName, Price, Quantity) VALUES ('" +
+		"Quantity='" + Quantity + "'\n" + "INSERT INTO Line (ReceiptId, ItemName, Price, Quantity) VALUES ('" +
 		ReceiptId + "', '" + ItemName + "', '" + Price + "', '" + Quantity + "')";
 	}
 
