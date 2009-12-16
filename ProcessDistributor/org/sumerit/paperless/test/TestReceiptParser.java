@@ -41,7 +41,7 @@ public class TestReceiptParser
 	public static String[] testProcessReceipt(String receipt)
 	{
 		ReceiptParser parser = new ReceiptParser(receipt);
-		String[] res = new String[6];
+		String[] res = new String[7];
 		
 		res[0] = parser.getReceiptId();
 		res[1] = parser.getItemName();

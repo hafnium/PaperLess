@@ -1,11 +1,11 @@
 1
-Orange 0.89
-Banana 0.59
-Mango 1.24
-Currant 2.36
-Papaya 1.23
-Potatoes 3.46
-Carrots 1.99
-Endives 2.39
-Saffron 9.99
-Shitake 3.10
+Orange 0.89 2009-12-15
+Banana 0.59 2009-12-15
+Mango 1.24 2009-12-15
+Currant 2.36 2009-12-15
+Papaya 1.23 2009-12-15
+Potatoes 3.46 2009-12-15
+Carrots 1.99 2009-12-15
+Endives 2.39 2009-12-15
+Saffron 9.99 2009-12-15
+Shitake 3.10 2009-12-15
