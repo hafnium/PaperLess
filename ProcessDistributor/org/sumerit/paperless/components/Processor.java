@@ -111,11 +111,9 @@ public class Processor extends Thread
 			return response;
 		} catch (IOException e) {
 			DistributedLogger.fatal("Processor::invokeRPC(): Could not connect to host (IO Exception): " + e.getMessage());
-			e.printStackTrace();
 			return null;
 		} catch (Exception e) {
 			DistributedLogger.fatal("Processor::invokeRPC(): Could not connect to host (Unknown Exception): " + e.getMessage());
-			e.printStackTrace();
 			return null;
 		}
 	}

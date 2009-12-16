@@ -12,6 +12,7 @@
     <property name="source" value="1.6"/>
     <path id="ProcessDistrbutor.classpath">
         <pathelement location="."/>
+        <pathelement location="../mysql-connector-java-5.1.10/mysql-connector-java-5.1.10-bin.jar"/>
     </path>
     <target name="init">
         <copy includeemptydirs="false" todir=".">
@@ -63,6 +64,12 @@
             <classpath refid="ProcessDistrbutor.classpath"/>
         </java>
     </target>
+    <target name="TestReceiptParser">
+        <java classname="org.sumerit.paperless.test.TestReceiptParser" failonerror="true" fork="yes">
+            <arg line="testCases.txt"/>
+            <classpath refid="ProcessDistrbutor.classpath"/>
+        </java>
+    </target>
     <target name="TestServer">
         <java classname="org.sumerit.paperless.test.TestServer" failonerror="true" fork="yes">
             <classpath refid="ProcessDistrbutor.classpath"/>
@@ -71,12 +78,6 @@
     <target name="TestSubmitter">
         <java classname="org.sumerit.paperless.test.TestSubmitter" failonerror="true" fork="yes">
             <arg line="localhost testCases.txt"/>
-            <classpath refid="ProcessDistrbutor.classpath"/>
-        </java>
-    </target>
-    <target name="TestReceiptParser">
-        <java classname="org.sumerit.paperless.test.TestReceiptParser" failonerror="true" fork="yes">
-            <arg line="testCases.txt"/>
             <classpath refid="ProcessDistrbutor.classpath"/>
         </java>
     </target>

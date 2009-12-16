@@ -1,4 +1,4 @@
 3
 localhost
-charcoal
-simba
+192.168.2.114
+simba.cs.virginia.edu
