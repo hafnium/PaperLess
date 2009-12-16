@@ -103,14 +103,14 @@ public class ReceiptProcessingServer extends ProcessingServer
 				con.close();
 				stmt.close();
 				DistributedLogger.warning("Receipt already exists in DB");
-				return new StringWritable("Warning: Receipt already exists in DB");
+			} else
+			{
+				String insertSQL = "INSERT INTO Receipt (ReceiptId, UserId, LocationId, Date) VALUES ('" + ReceiptId + "', '" + UserId + "', '" + LocationId + "', '" + Date + "')";
+				
+				stmt.executeUpdate(insertSQL); 
+				stmt.close();
+				SQL += insertSQL;
 			}
-	
-			String insertSQL = "INSERT INTO Receipt (ReceiptId, UserId, LocationId, Date) VALUES ('" + ReceiptId + "', '" + UserId + "', '" + LocationId + "', '" + Date + "')";
-			
-			stmt.executeUpdate(insertSQL); 
-			stmt.close();
-			SQL += insertSQL;
 		}
 		
 		{
@@ -136,16 +136,16 @@ public class ReceiptProcessingServer extends ProcessingServer
 				con.close();
 				stmt.close();
 				DistributedLogger.warning("Receipt already exists in DB");
-				return new StringWritable("Warning: Receipt already exists in DB");
+			} else
+			{
+				String insertSQL = "INSERT INTO Line (ReceiptId, ItemName, Price, Quantity) VALUES ('" + 	ReceiptId + "', '" +
+																											ItemName + "', '" +
+																											Price + "', '" +
+																											Quantity + "')";
+				stmt.executeUpdate(insertSQL); 
+				stmt.close();
+				SQL += insertSQL;
 			}
-
-			String insertSQL = "INSERT INTO Line (ReceiptId, ItemName, Price, Quantity) VALUES ('" + 	ReceiptId + "', '" +
-																										ItemName + "', '" +
-																										Price + "', '" +
-																										Quantity + "')";
-			stmt.executeUpdate(insertSQL); 
-			stmt.close();
-			SQL += insertSQL;
 		}
 		
 		con.close();
