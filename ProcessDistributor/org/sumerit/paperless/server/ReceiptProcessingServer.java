@@ -51,16 +51,20 @@ public class ReceiptProcessingServer extends ProcessingServer
 			} catch (ClassNotFoundException e)
 			{
 				DistributedLogger.fatal("Could not load mySQL JDBC Connector");
+				e.printStackTrace();
+				return new StringWritable("ERROR: Could not load mySQL JDBC Connector");
 			} catch (SQLException e)
 			{
 				DistributedLogger.fatal("Error executing SQL commands");
+				e.printStackTrace();
+				return new StringWritable("ERROR: Error executing SQL commands");
 			}
 		}
 		
 		return new StringWritable("ERROR: Could not execute request, please check arguments");
 	}
 	
-	public Writable processReceipt(String receipt) throws ClassNotFoundException, SQLException
+	public synchronized Writable processReceipt(String receipt) throws ClassNotFoundException, SQLException
 	{
 		String SQL = "";
 		ReceiptParser parser = new ReceiptParser(receipt);
@@ -100,7 +104,6 @@ public class ReceiptProcessingServer extends ProcessingServer
 			
 			if (rs.next()) 
 			{
-				con.close();
 				stmt.close();
 				DistributedLogger.warning("Receipt already exists in DB");
 			} else
@@ -133,7 +136,6 @@ public class ReceiptProcessingServer extends ProcessingServer
 			// Check if User is already in the database
 			if(rs.next())
 			{
-				con.close();
 				stmt.close();
 				DistributedLogger.warning("Receipt already exists in DB");
 			} else
@@ -144,7 +146,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 																											Quantity + "')";
 				stmt.executeUpdate(insertSQL); 
 				stmt.close();
-				SQL += insertSQL;
+				SQL += "\n\t" + insertSQL;
 			}
 		}
 		

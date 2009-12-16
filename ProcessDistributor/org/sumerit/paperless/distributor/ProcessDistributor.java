@@ -51,6 +51,7 @@ public class ProcessDistributor extends Thread
 				receiptQueue.add(receipt);
 				return;
 			}
+			System.out.println("Calling RPC command: " + receipt.get());
 			P.callRPC("processReceipt", receipt.get());
 			P.disconnect();
 			
