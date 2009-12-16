@@ -90,7 +90,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 			// in an object of type ResultSet
 			rs = stmt.executeQuery("SELECT * from Receipt WHERE " +
 					"UserId='" + UserId + "' AND " +
-					"ReceiptNumber='" + LocationId + "' AND " +
+					"LocationId='" + LocationId + "' AND " +
 					"Date='" + Date + "'");
 			
 
@@ -102,7 +102,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 				return "Receipt already exists in DB.";
 			}//end while loop
 
-			stmt.executeUpdate("INSERT INTO Receipt(UserId, ReceiptNumber, Date) VALUES ('" + 
+			stmt.executeUpdate("INSERT INTO Receipt(UserId, LocationId, Date) VALUES ('" + 
 					UserId + "', '" + LocationId + "', '" + 
 					Date + "')"); 
 		}
@@ -115,8 +115,8 @@ public class ReceiptProcessingServer extends ProcessingServer
 			disconnect( );
 		}
 		return "SELECT * from Receipt WHERE " +	"UserId='" + UserId + "' AND " +
-		"ReceiptNumber='" + LocationId + "' AND " +
-		"Date='" + Date + "'\n" + "INSERT INTO Receipt(UserId, ReceiptNumber, Date) VALUES ('" + 
+		"LocationId='" + LocationId + "' AND " +
+		"Date='" + Date + "'\n" + "INSERT INTO Receipt(UserId, LocationId, Date) VALUES ('" + 
 		UserId + "', '" + LocationId + "', '" + Date + "')\n";
 	}
 	
@@ -132,7 +132,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 			// in an object of type ResultSet
 			rs = stmt.executeQuery("SELECT * from Line WHERE " +
 					"ReceiptId='" + ReceiptId + "' AND " +
-					"ItemId='" + ItemName + "' AND " +
+					"ItemName='" + ItemName + "' AND " +
 					"Price='" + Price + "' AND " +
 					"Quantity='" + Quantity + "'");
 			
@@ -145,7 +145,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 				return "Line already exists in DB.";
 			}//end while loop
 
-			stmt.executeUpdate("INSERT INTO Line(ReceiptId, ItemId, Price, Quantity) VALUES ('" +
+			stmt.executeUpdate("INSERT INTO Line(ReceiptId, ItemName, Price, Quantity) VALUES ('" +
 					ReceiptId + "', '" +
 					ItemName + "', '" +
 					Price + "', '" +
@@ -161,9 +161,9 @@ public class ReceiptProcessingServer extends ProcessingServer
 		}
 		return "SELECT * from Line WHERE " +
 		"ReceiptId='" + ReceiptId + "' AND " +
-		"ItemId='" + ItemName + "' AND " +
+		"ItemName='" + ItemName + "' AND " +
 		"Price='" + Price + "' AND " +
-		"Quantity='" + Quantity + "'\n" + "INSERT INTO Line(ReceiptId, ItemId, Price, Quantity) VALUES ('" +
+		"Quantity='" + Quantity + "'\n" + "INSERT INTO Line(ReceiptId, ItemName, Price, Quantity) VALUES ('" +
 		ReceiptId + "', '" + ItemName + "', '" + Price + "', '" + Quantity + "')";
 	}
 
