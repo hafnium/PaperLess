@@ -1,57 +1,84 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- WARNING: Eclipse auto-generated file.
               Any modifications will be overwritten.
               To include a user specific buildfile here, simply create one in the same
               directory with the processing instruction <?eclipse.ant.import?>
               as the first entry and export the buildfile again. -->
-<project name="ProcessDistrbutor" default="build" basedir=".">
-  <property environment="env"/>
-  <property name="ECLIPSE_HOME" value="../../../../../usr/lib/eclipse"/>
-  <property name="debuglevel" value="source,lines,vars"/>
-  <property name="target" value="1.6"/>
-  <property name="source" value="1.6"/>
-  <path id="ProcessDistrbutor.classpath">
-    <pathelement location="."/>
-    <pathelement location="../../../Desktop/mysql-connector-java-3.1.14-bin.jar"/>
-  </path>
-  <target name="init">
-    <copy todir="." includeemptydirs="false">
-      <fileset dir="." excludes="**/*.launch, **/*.java"/>
-    </copy>
-  </target>
-  <target name="clean">
-    <delete>
-      <fileset dir="." includes="**/*.class"/>
-    </delete>
-  </target>
-  <target name="cleanall" depends="clean"/>
-  <target name="build" depends="build-subprojects,build-project"/>
-  <target name="build-subprojects"/>
-  <target name="build-project" depends="init">
-    <echo message="${ant.project.name}: ${ant.file}"/>
-    <javac destdir="." debug="true" debuglevel="${debuglevel}" source="${source}" target="${target}">
-      <src path="."/>
-      <exclude name="lib/"/>
-      <classpath refid="ProcessDistrbutor.classpath"/>
-    </javac>
-  </target>
-  <target name="build-refprojects" description="Build all projects which reference this project. Useful to propagate changes."/>
-  <target name="init-eclipse-compiler" description="copy Eclipse compiler jars to ant lib directory">
-    <copy todir="${ant.library.dir}">
-      <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-    </copy>
-    <unzip dest="${ant.library.dir}">
-      <patternset includes="jdtCompilerAdapter.jar"/>
-      <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
-    </unzip>
-  </target>
-  <target name="build-eclipse-compiler" description="compile project with Eclipse compiler">
-    <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
-    <antcall target="build"/>
-  </target>
-  <target name="TestServer">
-    <java fork="yes" classname="org.sumerit.paperless.test.TestServer" failonerror="true">
-      <classpath refid="ProcessDistrbutor.classpath"/>
-    </java>
-  </target>
+<project basedir="." default="build" name="ProcessDistrbutor">
+    <property environment="env"/>
+    <property name="ECLIPSE_HOME" value="../../../../../Applications/Eclipse"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <path id="ProcessDistrbutor.classpath">
+        <pathelement location="."/>
+        <pathelement location="../mysql-connector-java-5.1.10/mysql-connector-java-5.1.10-bin.jar"/>
+    </path>
+    <target name="init">
+        <copy includeemptydirs="false" todir=".">
+            <fileset dir=".">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+                <exclude name="lib/"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete>
+            <fileset dir="." includes="**/*.class"/>
+        </delete>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="." source="${source}" target="${target}">
+            <src path="."/>
+            <exclude name="lib/"/>
+            <classpath refid="ProcessDistrbutor.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="Tester">
+        <java classname="org.sumerit.paperless.test.Tester" failonerror="true" fork="yes">
+            <classpath refid="ProcessDistrbutor.classpath"/>
+        </java>
+    </target>
+    <target name="TestGateway">
+        <java classname="org.sumerit.paperless.test.TestGateway" failonerror="true" fork="yes">
+            <arg line="serverList.txt"/>
+            <classpath refid="ProcessDistrbutor.classpath"/>
+        </java>
+    </target>
+    <target name="TestReceiptParser">
+        <java classname="org.sumerit.paperless.test.TestReceiptParser" failonerror="true" fork="yes">
+            <arg line="testCases.txt"/>
+            <classpath refid="ProcessDistrbutor.classpath"/>
+        </java>
+    </target>
+    <target name="TestServer">
+        <java classname="org.sumerit.paperless.test.TestServer" failonerror="true" fork="yes">
+            <classpath refid="ProcessDistrbutor.classpath"/>
+        </java>
+    </target>
+    <target name="TestSubmitter">
+        <java classname="org.sumerit.paperless.test.TestSubmitter" failonerror="true" fork="yes">
+            <arg line="localhost testCases.txt"/>
+            <classpath refid="ProcessDistrbutor.classpath"/>
+        </java>
+    </target>
 </project>
