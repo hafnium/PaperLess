@@ -12,6 +12,7 @@ public class ReceiptParser
 	private final Pattern Upattern = Pattern.compile("\\{user: [0-9]+\\}");
 	private final Pattern Qpattern = Pattern.compile("\\{quantity: [0-9]+\\}");
 	private final Pattern Ppattern = Pattern.compile("\\{price: \\$?\\p{Blank}?[0-9]+\\.?[0-9]?[0-9]?\\}");
+	private final Pattern Dpattern = Pattern.compile("\\{date: (19|20)\\d\\d-0[1-9]|1[012]-(0[1-9]|[12]\\d|3[01])\\");
 	
 	public ReceiptParser(String _receipt)
 	{
@@ -71,5 +72,13 @@ public class ReceiptParser
 			start++;
 		
 		return S.substring(start, S.length()-1);
+	}
+	
+	public String getDate(){
+		Matcher M = Dpattern.matcher(receipt);
+		if (!M.find())
+			return "";
+		String S = M.group(0);
+		return S.substring(7, S.length()-1);
 	}
 }

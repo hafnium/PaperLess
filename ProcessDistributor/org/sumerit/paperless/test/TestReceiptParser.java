@@ -49,6 +49,7 @@ public class TestReceiptParser
 		res[3] = parser.getUser();
 		res[4] = parser.getQuantity();
 		res[5] = parser.getPrice();
+		res[6] = parser.getDate();
 		
 		return res;
 	}
