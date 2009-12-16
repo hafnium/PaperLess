@@ -72,6 +72,8 @@ public class ReceiptProcessingServer extends ProcessingServer
 		String LocationId = parser.getStore( );
 		String UserId = parser.getUser( );
 		String Date = parser.getDate( );
+		if(UserId.length( ) == 0)
+			UserId = "1";
 		if(Quantity.length( ) == 0)
 			Quantity = "1";
 		
