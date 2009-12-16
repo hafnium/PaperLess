@@ -17,7 +17,7 @@ public class TestServer implements ExceptionListener, RPCListener
 	public static void main(String[] args)
 	{
 		TestServer T = new TestServer();
-		DistributedLogger.setLevel(Level.ALL);
+		DistributedLogger.setLevel(Level.OFF);
 		try {
 			DistributedLogger.redirectOutput(new FileHandler("PaperLess.server.out"));
 		} catch (SecurityException e) {

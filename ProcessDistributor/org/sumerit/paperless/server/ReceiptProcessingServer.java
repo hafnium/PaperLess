@@ -95,7 +95,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 		    	return new StringWritable("ERROR: Could not connect to database");
 			}
 			
-			String selectSQL = "SELECT * from Receipt WHERE " +	"UserId='" + UserId + "' AND " + "LocationId='" + LocationId + "' AND " + "Date='" + Date + "'";
+			String selectSQL = "SELECT * from Receipt WHERE ReceiptId='" + ReceiptId + "'";
 			ResultSet rs = stmt.executeQuery(selectSQL);
 			
 			if (rs.next()) 
@@ -106,7 +106,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 				return new StringWritable("Warning: Receipt already exists in DB");
 			}
 	
-			String insertSQL = "INSERT INTO Receipt (UserId, LocationId, Date) VALUES ('" + UserId + "', '" + LocationId + "', '" + Date + "')";
+			String insertSQL = "INSERT INTO Receipt (ReceiptId, UserId, LocationId, Date) VALUES ('" + ReceiptId + "', '" + UserId + "', '" + LocationId + "', '" + Date + "')";
 			
 			stmt.executeUpdate(insertSQL); 
 			stmt.close();
