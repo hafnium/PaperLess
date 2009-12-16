@@ -145,7 +145,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 				return "Line already exists in DB.";
 			}//end while loop
 
-			stmt.executeUpdate("INSERT INTO Line(ReceiptId, ItemName, Price, Quantity) VALUES ('" +
+			stmt.executeUpdate("INSERT INTO Line (ReceiptId, ItemName, Price, Quantity) VALUES ('" +
 					ReceiptId + "', '" +
 					ItemName + "', '" +
 					Price + "', '" +
