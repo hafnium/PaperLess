@@ -17,6 +17,29 @@ public class TestSubmitter
 		System.out.println("Usage: TestSubmitted [gateway server] [test input file]");
 	}
 	
+	public static int idx = 0;
+	
+	public static void run(String[] args, String[] inputs)
+	{
+		try {
+			for (; idx < inputs.length; idx++)
+			{
+				System.out.println("Sending test " + inputs[idx]);
+				StringWritable str = new StringWritable(inputs[idx]);
+				
+				Socket sock = new Socket(args[0], ProcessDistributor.listeningPort);
+				str.write(new DataOutputStream(sock.getOutputStream()));
+				sock.close();
+				
+				Thread.sleep(10);
+			}
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+			run(args, inputs);
+		}
+	}
+	
 	public static void main(String[] args)
 	{
 		if (args.length < 2) {
@@ -26,25 +49,12 @@ public class TestSubmitter
 		
 		try {
 			String[] inputs = readInputs(args[1]);		
-			for (int i = 0; i < inputs.length; i++)
-			{
-				System.out.println("Sending test " + inputs[i]);
-				StringWritable str = new StringWritable(inputs[i]);
-				
-				Socket sock = new Socket(args[0], ProcessDistributor.listeningPort);
-				str.write(new DataOutputStream(sock.getOutputStream()));
-				sock.close();
-				
-				Thread.sleep(100);
-			}
+			run(args, inputs);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+		} 
 	}
 	
 	public static String[] readInputs(String file) throws NumberFormatException, IOException
