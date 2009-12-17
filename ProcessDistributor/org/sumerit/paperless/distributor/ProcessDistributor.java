@@ -51,9 +51,15 @@ public class ProcessDistributor extends Thread
 				receiptQueue.add(receipt);
 				return;
 			}
-			System.out.println("Calling RPC command: " + receipt.get());
-			P.callRPC("processReceipt", receipt.get());
+			//System.out.println("Calling RPC command: " + receipt.get());
+			boolean success = P.callRPC("processReceipt", receipt.get());
 			P.disconnect();
+			
+			if (!success) {
+				System.out.println("Requeueing...");
+				receiptQueue.add(receipt);
+				return;
+			}
 			
 			incrReceiptsProcessed();
 		}
@@ -106,7 +112,7 @@ public class ProcessDistributor extends Thread
 		}
 		
 		poll = true;
-		receiptQueue = new ArrayBlockingQueue<StringWritable>(100);
+		receiptQueue = new ArrayBlockingQueue<StringWritable>(10000);
 		queuePoller = new QueuePoller();
 		queuePoller.start();
 	}
@@ -136,7 +142,8 @@ public class ProcessDistributor extends Thread
 	private synchronized void incrReceiptsProcessed()
 	{
 		receiptsProcessed++;
-		DistributedLogger.info("Processed " + receiptsProcessed + " receipts");
+		DistributedLogger.info("Processed " + receiptsProcessed + " receipts");		
+		System.out.println("Processed " + receiptsProcessed + " receipts");
 	}
 	
 	public void run()

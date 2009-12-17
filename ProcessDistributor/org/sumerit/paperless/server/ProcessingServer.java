@@ -13,7 +13,6 @@ import org.sumerit.paperless.connection.InternetConnector;
 import org.sumerit.paperless.constants.RPCState;
 import org.sumerit.paperless.events.ExceptionListener;
 import org.sumerit.paperless.io.IntWritable;
-import org.sumerit.paperless.io.Writable;
 import org.sumerit.paperless.logging.DistributedLogger;
 
 public abstract class ProcessingServer extends Thread
@@ -79,8 +78,7 @@ public abstract class ProcessingServer extends Thread
 				{
 					if (checkAvailableTypes(command.getProcedure()))
 					{
-						System.out.println("Executing command: " + command.toString());
-						RPCResponse response = new RPCResponse(execute(command.getProcedure(), command.getArguments()));
+						RPCResponse response = execute(command.getProcedure(), command.getArguments());
 						DistributedLogger.info("Executed command: " + command.toString());
 						System.out.println("\tDONE!");
 						
@@ -113,7 +111,7 @@ public abstract class ProcessingServer extends Thread
 	private ExceptionListener errListener;
 	
 	public abstract boolean checkAvailableTypes(String query);
-	public abstract Writable execute(String proc, String args);
+	public abstract RPCResponse execute(String proc, String args);
 	
 	public ProcessingServer(InternetConnector connector)
 	{		

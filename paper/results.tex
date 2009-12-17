@@ -1,4 +1,40 @@
-\section{Implementation and Results}
+\section{Results}
+\label{sec:results}
+
+Our goal was to create a system that could process receipts in a
+scalable and reliable way. We have defined scalability as the ability
+to quickly and seemlessly add or remove processing
+entities. Reliability refers to the persistance of data after it has
+been received by our system. We have described our system and its
+specific implementation to date in Section~\ref{sec:overview} and
+Section~\ref{sec:implementation}. Now we set out to evaluate our work.
+
+First we will consider scalability. In order to test the scalability
+of our system we required a large test set. As mentioned in
+Section~\ref{sec:implementation.processing}, we were unable to get
+adequate results from an optical character recognition package we
+tried. We tried Tesseract and SimpleOCR on a small set of test
+receipts. Although according to 1995 UNLV Accuracy Test, Tesseract is
+one of the best OCR packages available. However, our initial tests
+deemed it unable to extract text correctly from receipts most likely
+due to the poor resolution available and the non-standard layouts
+present in receipts from many different companies. Therefore, we chose to consider receipts as strings with fields corresponding to what would have been extracted from an OCR package. A typical receipt line then takes the form:
+\begin{centering}
+  {receipt:RECEIPT_ID} {item: ITEM_NAME} {price: ITEM_PRICE} {quantity: QUANTITY} {store: STORE_ID} {date: PURCHASE_DATE}
+\end{centering}
+
+For our tests, we generated 100,000 lines of this format. We then
+wrote a simple test harness that looped over the list and sent each
+line to the process distributor gateway. We ran this test with only
+two processing servers available. Unfortunately, the bottleneck was
+the mySQL cluster. Since each connection to a mySQL database requires
+opening a file, the number of allowable open files was quickly
+saturated. However, as we scaled back the number oftest receipts to
+5,000, we saw that we could efficiently process receipts with our
+system. In addition, if we removed one of the servers by killing it,
+the process distributor properly sent the receipts to the other
+available servers. Likewise, if we added a new server, the disitrbutor
+was able to adapt and send receipts to the newly added one too.
 
 \remark{Explain exactly what we accomplished and how we measured our
   success. Should describe the test cases that we used and how we

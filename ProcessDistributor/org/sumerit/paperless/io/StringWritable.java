@@ -34,4 +34,9 @@ public class StringWritable implements Writable
 	{
 		return this.data;
 	}
+	
+	public void set(String _data)
+	{
+		this.data = _data;
+	}
 }

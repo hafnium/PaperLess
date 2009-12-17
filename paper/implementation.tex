@@ -1,0 +1,94 @@
+\section{Implementation}
+\label{sec:implementation}
+
+In the spirit of good software engineering practices we made every
+effort to abide by a rigorous approach during development. The outcome
+of our efforts was a similar, but slightly tailored version, of the
+agile method. We dub our method rapid collaborative refinement. In
+essence, due to our small development team (2), close proximity, and
+unqiue abilities we were able to very quickly refine a particular
+piece of code or refine our approach by alternating between personal
+interaction and separated investigation. The lifecycle for a
+particular system-level decision was therefore reduced to a small
+overhead leaving us more time to focus on developing useful software
+and well-constructed software. This approach is depicted graphically
+in Figure~\ref{fig:RCR}. Notice that we are able to more tightly close
+the loop on developing a particular aspect of the system due to our
+methodology.
+
+Our development environment consisted of several testing machines
+running Linux and Mac OS X, the Eclipse IDE, git source code
+management through github.com, mySQL Cluster Server, and MyEclipse for
+making logical diagrams. All code was written in JAVA so that we
+would have more flexibility in deplyoment options.
+
+We know describe in detail the actual software behind our system. In
+Section~\ref{sec:overview} we discussed the high-level overview of our
+system. Now we will explain exactly what we did, and what we didn't
+do. We will start by describing our implementation of the processing
+group and then move on to the data warehousing group.
+
+\subsection{Processing Group}
+\label{implementation.processing}
+
+From a high-level perspective, the processing group is responsible for
+processing a set of receipts in an efficient and scalable manner. For
+this reason we chose to separate the role of process assignment and
+process fulfillment. Our ProcessDistributor acts as the assigner. It
+polls its listening socket and waits for a request to process a
+receipt. When it receives a request, it simply puts the request into a
+FIFO queue. A separate thread continuously checks the queue for
+elements and upon finding one creates a new handling thread that will
+process the item.
+
+Each handling thread executes a remote procedure call (RPC) to a
+ReceiptProcessingServer. The particular server chosen is determined by
+the ProcessDistributor and is currently just a round-robin
+selection. The RPC itself was written from scratch so that we would
+have the flexibility to create a lightweight object tailored to our
+very simple needs. RPC's are implemented as serializable objects that
+can be transferred via a socket to a ReceiptProcessingServer. Upon
+receiving the RPC, the processing server extracts the necessary
+information from the parameter field, saves the relevant data to the
+mySQL backend (see Section~\ref{sec:implementation.db}), and then
+returns a response.
+
+As discussed in Section~\ref{sec:overview.processing} our goal was to
+be able to process imags of receipts. These images would be stored on
+a distributed file system and the RPC parameters would just consist of
+a file handle to the particular receipt image to be processed. Due to
+complications, we were unable to accurately perform OCR on
+images. Section~\ref{sec:results} describese in more detail exactly
+what these complications were. Nevertheless, we still wanted to
+implement a working system if not complete. In our current
+implementation, the parameter to the RPC is a string representation of
+a receipt. Our system then parses the string representation (just as
+it would parse the output of OCR) for the item name, price, quantity,
+seller, user information, etc. This information is saved to our mySQL
+cluster database through the JAVA mySQL connector.
+
+If at any time there is an error on the processing server, a message
+is sent bck to the distributor notifying it of the error. The
+distributor is then able, depending on the error, to re-queue the
+receipt for processing again. Some situations where this would be
+appropriate would be if the processing server happens to lose
+connectivity with the mySQL database.
+
+The beauty of the system is that independent functional parts are
+separated by logical and information boundaries. The distributor knows
+only a list of possible processing servers. It holds the queue and
+iteratively attempts to empty the queue by sending RPC's through its
+handling threads to a processing server. The processing servers, in
+turn, know nothing about the distributor. They simply listen for data
+on their sockets, process requests that come to them, and return the
+results. Similarly the database has no knowledge of the specifics of
+neither the processing servers nor the distributor. This setup allows
+us to very easily scale the entire operation as needed. We need only
+notify the distributor that another potential processing server is
+available. All other parts are completely agnostic to its pressence or
+lack thereof.
+
+\subsection{Data Warehousing Group}
+\label{sec:implementation.db}
+
+\remark{Fill in details about the actual implementation of the database group. Include specifics about libraries, schema, etc. DO NOT include information regarding any results. We have a separate section for that :)}

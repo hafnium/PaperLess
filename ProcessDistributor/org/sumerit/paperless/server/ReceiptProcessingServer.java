@@ -7,9 +7,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 
+import org.sumerit.paperless.components.RPCResponse;
 import org.sumerit.paperless.connection.InternetConnector;
+import org.sumerit.paperless.constants.RPCState;
+import org.sumerit.paperless.io.IntWritable;
 import org.sumerit.paperless.io.StringWritable;
-import org.sumerit.paperless.io.Writable;
 import org.sumerit.paperless.logging.DistributedLogger;
 
 public class ReceiptProcessingServer extends ProcessingServer 
@@ -41,30 +43,35 @@ public class ReceiptProcessingServer extends ProcessingServer
 			return true;
 	}
 
-	public Writable execute(String proc, String args) 
+	public RPCResponse execute(String proc, String args) 
 	{
+		StringWritable res = new StringWritable();
+		int state = RPCState.ERROR_UNKNOWN_PROCESS;
+		
 		String[] argv = args.split("\n");
 		if (proc.compareTo("processReceipt") == 0)
 		{
 			try {
-				return this.processReceipt(argv[0]);
+				if(this.processReceipt(argv[0], res))
+					state = RPCState.SUCCESS;
 			} catch (ClassNotFoundException e)
 			{
 				DistributedLogger.fatal("Could not load mySQL JDBC Connector");
 				e.printStackTrace();
-				return new StringWritable("ERROR: Could not load mySQL JDBC Connector");
+				res = new StringWritable("ERROR: Could not load mySQL JDBC Connector");
 			} catch (SQLException e)
 			{
 				DistributedLogger.fatal("Error executing SQL commands");
 				e.printStackTrace();
-				return new StringWritable("ERROR: Error executing SQL commands");
+				res = new StringWritable("ERROR: Error executing SQL commands");
 			}
-		}
+		} else
+			res = new StringWritable("ERROR: Could not execute request, please check arguments");
 		
-		return new StringWritable("ERROR: Could not execute request, please check arguments");
+		return new RPCResponse(new IntWritable(state), res);
 	}
 	
-	public synchronized Writable processReceipt(String receipt) throws ClassNotFoundException, SQLException
+	public synchronized boolean processReceipt(String receipt, StringWritable res) throws ClassNotFoundException, SQLException
 	{
 		String SQL = "";
 		ReceiptParser parser = new ReceiptParser(receipt);
@@ -75,7 +82,8 @@ public class ReceiptProcessingServer extends ProcessingServer
 	    if (con == null)
 	    {
 	    	DistributedLogger.fatal("Could not connect to database");
-	    	return new StringWritable("ERROR: Could not connect to database");
+	    	res.set(new String("Could not connect to database"));
+	    	return false;
 	    }
 	    
 		String ReceiptId = parser.getReceiptId( );
@@ -90,13 +98,15 @@ public class ReceiptProcessingServer extends ProcessingServer
 		if(Quantity.length( ) == 0)
 			Quantity = "1";
 		
+		try
 		{
 			Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			if (stmt == null)
 			{
 				con.close();
 				DistributedLogger.fatal("Could not connect to database");
-		    	return new StringWritable("ERROR: Could not connect to database");
+		    	res.set(new String("ERROR: Could not connect to database"));
+		    	return false;
 			}
 			
 			String selectSQL = "SELECT * from Receipt WHERE ReceiptId='" + ReceiptId + "'";
@@ -114,8 +124,14 @@ public class ReceiptProcessingServer extends ProcessingServer
 				stmt.close();
 				SQL += insertSQL;
 			}
+		} catch(SQLException e)
+		{
+			con.close();
+			res.set(new String("ERROR: SQL Exception"));
+			return false;
 		}
 		
+		try
 		{
 			// Create a stmt object
 			Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -123,7 +139,8 @@ public class ReceiptProcessingServer extends ProcessingServer
 			{
 				con.close();
 				DistributedLogger.fatal("Could not connect to database");
-		    	return new StringWritable("ERROR: Could not connect to database");
+				res.set(new String("ERROR: Could not connect to database"));
+				return false;
 			}
 
 			String selectSQL = "SELECT * from Line WHERE " + 	"ReceiptId='" + ReceiptId + "' AND " + 
@@ -148,10 +165,16 @@ public class ReceiptProcessingServer extends ProcessingServer
 				stmt.close();
 				SQL += "\n\t" + insertSQL;
 			}
+		} catch(SQLException e)
+		{
+			con.close();
+			res.set(new String("ERROR: SQL Exception"));
+			return false;
 		}
 		
 		con.close();
-					
-		return new StringWritable(SQL);
+		
+		res.set(SQL);
+		return true;
 	}
 }

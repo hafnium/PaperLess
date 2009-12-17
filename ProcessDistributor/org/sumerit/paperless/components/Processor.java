@@ -46,23 +46,22 @@ public class Processor extends Thread
 			this.listeners.add(iter.next());
 	}
 	
-	public void callRPC(final String proc, final String args)
+	public boolean callRPC(final String proc, final String args)
 	{
 		DistributedLogger.debug("Making RPC call to function: " + proc);
-		//if (this.initiateRPC(proc))
-		//{
-			DistributedLogger.debug("RPC call to function: " + proc + " accepted!");
-			RPCEvent e = new RPCEvent(this.invokeRPC(new StringWritable(), RPCCommand.EXECUTE, proc, args));
-			
-			if (e.getReponse() == null)
-				return;
-			
-			if (listeners != null)
-			{
-				for (int i = 0; i < listeners.size(); i++)
-					listeners.elementAt(i).handleEvent(e);
-			}			
-		//} 
+		DistributedLogger.debug("RPC call to function: " + proc + " accepted!");
+		RPCEvent e = new RPCEvent(this.invokeRPC(new StringWritable(), RPCCommand.EXECUTE, proc, args));
+		
+		if (e.getReponse() == null)
+			return false;
+		
+		if (listeners != null)
+		{
+			for (int i = 0; i < listeners.size(); i++)
+				listeners.elementAt(i).handleEvent(e);
+		}	
+		
+		return (e.getReponse().getState() == RPCState.SUCCESS);
 	}
 		
 	public boolean initiateRPC(String proc) 
