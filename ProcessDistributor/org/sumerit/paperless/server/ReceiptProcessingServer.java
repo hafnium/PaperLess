@@ -112,7 +112,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 			String selectSQL = "SELECT * from Receipt WHERE ReceiptId='" + ReceiptId + "'";
 			ResultSet rs = stmt.executeQuery(selectSQL);
 			
-			if (rs.next()) 
+			if (false)//rs.next()) 
 			{
 				stmt.close();
 				DistributedLogger.warning("Receipt already exists in DB");
@@ -151,7 +151,7 @@ public class ReceiptProcessingServer extends ProcessingServer
 			
 
 			// Check if User is already in the database
-			if(rs.next())
+			if(false)//rs.next())
 			{
 				stmt.close();
 				DistributedLogger.warning("Receipt already exists in DB");
