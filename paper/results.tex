@@ -26,13 +26,21 @@ present in receipts from many different companies. Therefore, we chose to consid
 
 For our tests, we generated 100,000 lines of this format. We then
 wrote a simple test harness that looped over the list and sent each
-line to the process distributor gateway. We ran this test with only
-two processing servers available. Unfortunately, the bottleneck was
-the mySQL cluster. Since each connection to a mySQL database requires
-opening a file, the number of allowable open files was quickly
-saturated. However, as we scaled back the number oftest receipts to
-5,000, we saw that we could efficiently process receipts with our
-system. In addition, if we removed one of the servers by killing it,
-the process distributor properly sent the receipts to the other
-available servers. Likewise, if we added a new server, the disitrbutor
-was able to adapt and send receipts to the newly added one too.
+line to the process distributor gateway. We ran this test with three
+processing servers available. The bottleneck in the system is the
+distributor. It receives all of the requests nearly simultaneously and
+must federate them off to individual threads while maintaining a queue
+of the non-processed receipts. In a setting where there are hundreds
+of thousands of receipts coming in at once, this can become a
+burden. However, even with a modest hardware configuration consisting
+of a MacBook Pro with 2GB of RAM and a 2.16GHz Core2 Duo we were able
+to handle \remark{XXX} requests. 
+
+We also ran tests to assess the ability for our system to adapt to new
+or failed servers. We began by running the same test as before but in
+the middle of the test we killed off a node. The distributor was able
+to distribute the receipts effectively across the remaining servers in
+the pool. Likewise, if we added a new server, the disitrbutor was able
+to adapt and send receipts to the newly added one too. Our tests show
+that we have indeed created an effective receipt processing system
+than be scaled to meet demand.

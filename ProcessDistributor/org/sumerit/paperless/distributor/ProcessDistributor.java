@@ -43,13 +43,13 @@ public class ProcessDistributor extends Thread
 		
 		public void run()
 		{
-			System.out.println("Sending request");
+			//System.out.println("Sending request");
 			Processor P = new Processor(new HttpConnector());			
 			if (this.listeners != null)
 				P.addListeners(this.listeners);
 			P.start();
 			if (!P.connect(this.hostname)) {
-				System.out.println("Requeueing...");
+				//System.out.println("Requeueing...");
 				receiptQueue.add(receipt);
 				return;
 			}
@@ -58,7 +58,7 @@ public class ProcessDistributor extends Thread
 			P.disconnect();
 			
 			if (!success) {
-				System.out.println("Requeueing...");
+				//System.out.println("Requeueing...");
 				receiptQueue.add(receipt);
 				return;
 			}
