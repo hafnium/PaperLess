@@ -19,8 +19,9 @@ one of the best OCR packages available. However, our initial tests
 deemed it unable to extract text correctly from receipts most likely
 due to the poor resolution available and the non-standard layouts
 present in receipts from many different companies. Therefore, we chose to consider receipts as strings with fields corresponding to what would have been extracted from an OCR package. A typical receipt line then takes the form:
+
 \begin{centering}
-  {receipt:RECEIPT_ID} {item: ITEM_NAME} {price: ITEM_PRICE} {quantity: QUANTITY} {store: STORE_ID} {date: PURCHASE_DATE}
+\{receipt:RECEIPT ID\} \{item: ITEM NAME\} \{price: ITEM PRICE\} \{quantity: QUANTITY\} \{store: STORE ID\} \{date: PURCHASE DATE\}
 \end{centering}
 
 For our tests, we generated 100,000 lines of this format. We then
