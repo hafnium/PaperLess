@@ -18,7 +18,7 @@ analysis.
 \subsection{Receipt Processing}
 \label{sec:overview.processing}
 
-An crucial property of our entire system is that it scale well with
+A crucial property of our entire system is that it scale well with
 the demands of the customers. As such, our design of the receipt
 processing pool reflects this goal. The vision of our system is that
 it will able to efficiently and reliably serve many millions of
@@ -67,10 +67,8 @@ set of lines, and saves the information to our data warehouse.
 \subsection{Database Overview}
 \label{sec:overview.db}
 
-\remark{Describe the server architecture (RPC, Sockets, etc). Also
-desribe the distributed nature of the whole system. MySQL
-server. Gateway. Redundancy. Basically tie in the information from the
-requirements section. This section should read like the specification
-but not be as formal. Make sure to ref the spec document though. Maybe
-take some time to discuss out Rapid Collaborative Refinement
-procedure.}
+As previously stated a primary goal of our system is that it is scallable.  To accomodate this requirement on the backend, we elected to run our data warehouse on a MySql Cluster.  The two most appealing aspects of MySql Cluster for our project are that it allows for multiple management nodes and that storage nodes can be added and removed on the fly.  It is essential that in the absence of catastrophic failure our system remains functional.  The system must be able to recover gracefully from errors such as power failures, disk failures, connection failures, etc.  MySql accomodates this necessity by automatically replicating data over storage nodes when a storage node fails to satisfy our desired redundancy.
+
+In accordance with our requirement that there be no single point of failure in our system we decided that a distributed architecture was essential.  We have designed the system such that the data warehouse consists of multiple geographically separated locations which together represent the entire database.
+
+Another crucial aspect of the MySql cluster is that it load balances automatically.  This was a major benefeit for our project because while we wanted to develop a system that was customized to our needs, we didn't want to re-invent the wheel.  We believe that any issues regarding load-balancing in MySql Cluster are low-risk.  If load balancing becomes an issue, it can be resolved easily by adding more management and storage nodes.  It may not be an elegant solution, but commodity hardware is cheap and the benefeit of developing a custom load balancer to suit our needs does not outway the effort and time required to do so.
