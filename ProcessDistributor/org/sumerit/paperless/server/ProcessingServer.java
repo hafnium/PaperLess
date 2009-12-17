@@ -80,7 +80,7 @@ public abstract class ProcessingServer extends Thread
 					{
 						RPCResponse response = execute(command.getProcedure(), command.getArguments());
 						DistributedLogger.info("Executed command: " + command.toString());
-						System.out.println("\tDONE!");
+						System.out.println("Executed command: " + command.toString());
 						
 						// Get remote socket information
 						InetSocketAddress clientAddress = (InetSocketAddress) this.socket.getRemoteSocketAddress();
