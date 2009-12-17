@@ -20,6 +20,8 @@ public class ReceiptProcessingServer extends ProcessingServer
 	private final String pass = "test";
 	private final String url = "jdbc:mysql://76.120.194.253:3306/Paperless";
 	
+	private Connection con = null;
+	
 	/*
 	public native String ocrImage(String imageFilename);
 	
@@ -31,6 +33,25 @@ public class ReceiptProcessingServer extends ProcessingServer
 	public ReceiptProcessingServer(InternetConnector connector) 
 	{
 		super(connector);
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+	    	System.err.println("Could not find JDBC class");
+	    	System.exit(-1);
+		}
+		try {
+			con = DriverManager.getConnection(url, user, pass);
+		} catch (SQLException e) {
+	    	System.err.println("Could not connect to database");
+	    	System.exit(-1);
+		}
+	    if (con == null)
+	    {
+	    	DistributedLogger.fatal("Could not connect to database");
+	    	System.err.println("Could not connect to database");
+	    	System.exit(-1);
+	    }
 	}
 
 	private static final String[] services = {"processReceipt"};
@@ -76,15 +97,6 @@ public class ReceiptProcessingServer extends ProcessingServer
 		String SQL = "";
 		ReceiptParser parser = new ReceiptParser(receipt);
 		//ReceiptDatum = ocrImage(receipt);
-		
-		Class.forName("com.mysql.jdbc.Driver");
-	    Connection con = DriverManager.getConnection(url, user, pass);
-	    if (con == null)
-	    {
-	    	DistributedLogger.fatal("Could not connect to database");
-	    	res.set(new String("Could not connect to database"));
-	    	return false;
-	    }
 	    
 		String ReceiptId = parser.getReceiptId( );
 		String ItemName = parser.getItemName( );
@@ -103,32 +115,33 @@ public class ReceiptProcessingServer extends ProcessingServer
 			Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			if (stmt == null)
 			{
-				con.close();
 				DistributedLogger.fatal("Could not connect to database");
 		    	res.set(new String("ERROR: Could not connect to database"));
 		    	return false;
 			}
-			
-			String selectSQL = "SELECT * from Receipt WHERE ReceiptId='" + ReceiptId + "'";
+			/*
+			String selectSQL = "SELECT ReceiptId from Receipt WHERE ReceiptId='" + ReceiptId + "'";
+			System.out.println("\t" + selectSQL);
 			ResultSet rs = stmt.executeQuery(selectSQL);
 			
 			if (rs.next()) 
 			{
 				stmt.close();
 				DistributedLogger.warning("Receipt already exists in DB");
-			} else
+			} else*/
 			{
 				String insertSQL = "INSERT INTO Receipt (ReceiptId, UserId, LocationId, Date) VALUES ('" + ReceiptId + "', '" + UserId + "', '" + LocationId + "', '" + Date + "')";
-				
+				System.out.println("\t" + insertSQL);
 				stmt.executeUpdate(insertSQL); 
 				stmt.close();
 				SQL += insertSQL;
 			}
 		} catch(SQLException e)
 		{
-			con.close();
-			res.set(new String("ERROR: SQL Exception"));
-			return false;
+			if (e.getErrorCode() != 1296) {
+				res.set(new String("ERROR: SQL Exception ") + e.getMessage());
+				return false;
+			}
 		}
 		
 		try
@@ -137,42 +150,45 @@ public class ReceiptProcessingServer extends ProcessingServer
 			Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			if (stmt == null)
 			{
-				con.close();
 				DistributedLogger.fatal("Could not connect to database");
 				res.set(new String("ERROR: Could not connect to database"));
 				return false;
 			}
-
+			/*
 			String selectSQL = "SELECT * from Line WHERE " + 	"ReceiptId='" + ReceiptId + "' AND " + 
 																"ItemName='" + ItemName + "' AND " + 
 																"Price='" + Price + "' AND " +	
 																"Quantity='" + Quantity + "'";
+			System.out.println("\t" + selectSQL);
 			ResultSet rs = stmt.executeQuery(selectSQL);
 			
-
+			*/
 			// Check if User is already in the database
-			if(rs.next())
-			{
-				stmt.close();
-				DistributedLogger.warning("Receipt already exists in DB");
-			} else
+			//if(rs.next())
+			//{
+			//	stmt.close();
+			//	DistributedLogger.warning("Receipt already exists in DB");
+			//} else
 			{
 				String insertSQL = "INSERT INTO Line (ReceiptId, ItemName, Price, Quantity) VALUES ('" + 	ReceiptId + "', '" +
 																											ItemName + "', '" +
 																											Price + "', '" +
 																											Quantity + "')";
+				System.out.println("\t" + insertSQL);
 				stmt.executeUpdate(insertSQL); 
 				stmt.close();
 				SQL += "\n\t" + insertSQL;
 			}
 		} catch(SQLException e)
 		{
-			con.close();
-			res.set(new String("ERROR: SQL Exception"));
-			return false;
+			if (e.getErrorCode() != 1296) {
+				res.set(new String("ERROR: SQL Exception ") + e.getMessage());
+				return false;
+			} else {
+				res.set(new String("WARNING: Duplicate row in database"));
+				return true;
+			}
 		}
-		
-		con.close();
 		
 		res.set(SQL);
 		return true;
