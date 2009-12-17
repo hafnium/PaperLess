@@ -6,9 +6,9 @@ effort to abide by a rigorous approach during development. The outcome
 of our efforts was a similar, but slightly tailored version, of the
 agile method. We dub our method rapid collaborative refinement. In
 essence, due to our small development team (2), close proximity, and
-unqiue abilities we were able to very quickly refine a particular
+unique abilities we were able to very quickly refine a particular
 piece of code or refine our approach by alternating between personal
-interaction and separated investigation. The lifecycle for a
+interaction and individual investigation. The lifecycle for a
 particular system-level decision was therefore reduced to a small
 overhead leaving us more time to focus on developing useful software
 and well-constructed software. This approach is depicted graphically
@@ -22,12 +22,12 @@ Our development environment consisted of several testing machines
 running Linux and Mac OS X, the Eclipse IDE, git source code
 management through github.com, mySQL Cluster Server, and MyEclipse for
 making logical diagrams. All code was written in JAVA so that we
-would have more flexibility in deplyoment options.
+would have more flexibility in deployment options.
 
-We know describe in detail the actual software behind our system. In
+We now describe in detail the actual software behind our system. In
 Section~\ref{sec:overview} we discussed the high-level overview of our
-system. Now we will explain exactly what we did, and what we didn't
-do. We will start by describing our implementation of the processing
+system. We will explain exactly what we did, and what we didn't
+do. We start by describing our implementation of the processing
 group and then move on to the data warehousing group.
 
 \subsection{Processing Group}
@@ -56,13 +56,13 @@ mySQL backend (see Section~\ref{sec:implementation.db}), and then
 returns a response.
 
 As discussed in Section~\ref{sec:overview.processing} our goal was to
-be able to process imags of receipts. These images would be stored on
+be able to process images of receipts. These images would be stored on
 a distributed file system and the RPC parameters would just consist of
 a file handle to the particular receipt image to be processed. Due to
 complications, we were unable to accurately perform OCR on
-images. Section~\ref{sec:results} describese in more detail exactly
+images. Section~\ref{sec:results} describes in more detail exactly
 what these complications were. Nevertheless, we still wanted to
-implement a working system if not complete. In our current
+implement a working system. In our current
 implementation, the parameter to the RPC is a string representation of
 a receipt. Our system then parses the string representation (just as
 it would parse the output of OCR) for the item name, price, quantity,
@@ -70,7 +70,7 @@ seller, user information, etc. This information is saved to our mySQL
 cluster database through the JAVA mySQL connector.
 
 If at any time there is an error on the processing server, a message
-is sent bck to the distributor notifying it of the error. The
+is sent back to the distributor notifying it of the error. The
 distributor is then able, depending on the error, to re-queue the
 receipt for processing again. Some situations where this would be
 appropriate would be if the processing server happens to lose
@@ -87,7 +87,7 @@ results. Similarly the database has no knowledge of the specifics of
 neither the processing servers nor the distributor. This setup allows
 us to very easily scale the entire operation as needed. We need only
 notify the distributor that another potential processing server is
-available. All other parts are completely agnostic to its pressence or
+available. All other parts are completely agnostic to its presence or
 lack thereof.
 
 \subsection{Data Warehousing Group}
@@ -98,11 +98,11 @@ Cluster.  The Cluster consists of multiple management nodes which
 oversee a variable number of storage nodes running on commodity
 systems.  The level of redundancy is maintained by the management
 nodes and can be adjusted as necessary.  Data is copied to multiple
-storage nodes to reflect the desired level of redundancy to ensure
+storage nodes to reflect the desired level of redundancy and ensure
 data integrity.
 
 As a proof of concept, we configured a small three system cluster with
-one system acting as both a management node and storage node.  This
+one system acting as both a management node and a storage node.  This
 allowed us to run experiments using different levels of redundancy and
 simulated failures.  In the early stages of the project we simulated a
 distributed cluster using a single machine.  While this provided
@@ -114,19 +114,19 @@ see in action than the simulated version.
 
 To improve access time and remove redundancy from the database we
 spent a good portion of our planning phase devising an appropriate
-schema for the database.  Our schema is organized as tree structure
-containing six distinct tables: Line, Receipt, User, Location, Store,
+schema for the database.  Our schema is organized as a tree structure
+containing six distinct tables: Line, Receipt, User, Location, Store, and
 City.  We will now discuss these in further detail.
 
 The Line object contains all information pertaining to a single item
 from a receipt.  This includes a the item name, the price per unit,
 and the quantity purchased.  The Line object also contains a reference
-to a Receipt object.  The Receipt object consiste the date of the
+to a Receipt object.  The Receipt object consists of the date of the
 purchase, and references to both a User object and a Location object.
 The User object simply contains the registration information for a
 particular user.  It is used to determine which receipts belong to
-which users.  The Location object contain refrences to both a Store
-object and a City object.  These references are used to accomodate
+which users.  The Location object contain references to both a Store
+object and a City object.  These references are used to accommodate
 retail chains that may have more than one location in a single city.
 The City object contains fields for city, state, and zip.  This
 reduces redundancy when the system contains multiple clients in the

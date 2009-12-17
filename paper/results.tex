@@ -3,8 +3,8 @@
 
 Our goal was to create a system that could process receipts in a
 scalable and reliable way. We have defined scalability as the ability
-to quickly and seemlessly add or remove processing
-entities. Reliability refers to the persistance of data after it has
+to quickly and seamlessly add and remove processing
+entities. Reliability refers to the persistence of data after it has
 been received by our system. We have described our system and its
 specific implementation to date in Section~\ref{sec:overview} and
 Section~\ref{sec:implementation}. Now we set out to evaluate our work.
@@ -14,7 +14,7 @@ of our system we required a large test set. As mentioned in
 Section~\ref{sec:implementation.processing}, we were unable to get
 adequate results from an optical character recognition package we
 tried. We tried Tesseract and SimpleOCR on a small set of test
-receipts. Although according to 1995 UNLV Accuracy Test, Tesseract is
+receipts. According to the 1995 UNLV Accuracy Test, Tesseract is
 one of the best OCR packages available. However, our initial tests
 deemed it unable to extract text correctly from receipts most likely
 due to the poor resolution available and the non-standard layouts
@@ -40,12 +40,12 @@ We also ran tests to assess the ability for our system to adapt to new
 or failed servers. We began by running the same test as before but in
 the middle of the test we killed off a node. The distributor was able
 to distribute the receipts effectively across the remaining servers in
-the pool. Likewise, if we added a new server, the disitrbutor was able
+the pool. Likewise, if we added a new server, the distributor was able
 to adapt and send receipts to the newly added one too. Our tests show
 that we have indeed created an effective receipt processing system
 that can be scaled to meet demand.
 
 Since one of our goals was to develop our system in line with standard
-Software Engineering practice we also provide results for our logical,
+Software Engineering practices we also provide results for our logical,
 infrastructure, and use case diagrams. These are included in Appendix
 A.
