@@ -43,12 +43,14 @@ public class ProcessDistributor extends Thread
 		
 		public void run()
 		{
+			System.out.println("Sending request");
 			Processor P = new Processor(new HttpConnector());			
 			if (this.listeners != null)
 				P.addListeners(this.listeners);
 			P.start();
 			if (!P.connect(this.hostname)) {
-				add(receipt);
+				System.out.println("Requeueing...");
+				receiptQueue.add(receipt);
 				return;
 			}
 			//System.out.println("Calling RPC command: " + receipt.get());
@@ -57,7 +59,7 @@ public class ProcessDistributor extends Thread
 			
 			if (!success) {
 				System.out.println("Requeueing...");
-				add(receipt);
+				receiptQueue.add(receipt);
 				return;
 			}
 			
@@ -75,8 +77,6 @@ public class ProcessDistributor extends Thread
 				{
 					ProcessCreator P = new ProcessCreator(receiptQueue.poll(), getNextAvailableServer(), rpcListeners);
 					P.start();
-					
-					System.out.println("Elements left in queue: " + receiptQueue.size());
 				}
 			}
 		}
@@ -96,7 +96,7 @@ public class ProcessDistributor extends Thread
 	private QueuePoller queuePoller;
 	
 	private int receiptsProcessed = 0;
-	private int recvCount = 0;
+	//private int recvCount = 0;
 	
 	private boolean poll;
 	
@@ -149,15 +149,6 @@ public class ProcessDistributor extends Thread
 		System.out.println("Processed " + receiptsProcessed + " receipts");
 	}
 	
-	private synchronized void add(StringWritable R)
-	{
-		this.receiptQueue.add(R);
-		recvCount++;
-		
-		if (((float) recvCount) % 500 == 0 )
-			System.out.println("Received " + recvCount);
-	}
-	
 	public void run()
 	{
 		while(poll)
@@ -186,7 +177,7 @@ public class ProcessDistributor extends Thread
 				e.printStackTrace();
 			}
 			
-			this.add(receipt);
+			this.receiptQueue.add(receipt);
 		}
 	}
 	
