@@ -1,0 +1,64 @@
+\section{Implementation}
+
+In the spirit of good software engineering practices we made every
+effort to abide by a particular development approach during
+developing. The outcome of our efforts was a similar, but slightly
+tailored version, to the agile method. We dub our method rapid
+collaborative refinement. In essence, due to our small development
+team (2), close proximity, and unqiue abilities we were able to very
+quickly refine a particular pieve of code or approach by alternating
+between personal interaction and secluded investigation. The lifecycle
+for a particular system-level decision was therefore reduced to a
+small overhead leaving us more time to focus on developing useful
+software in addition to well-constructed software. This approach is
+depicted graphically in Figure~\ref{fig:RCR}. Notice that we are able
+to more tightly close the loop on developing a particular aspect of
+the code due to our methodology.
+
+Our development environment consisted of several testing machines
+running Linux and Mac OS X, the Eclipse IDE, git source code
+management, mySQL Cluster Server, and MyEclipse for making logical
+diagrams. All our code was written in JAVA so that we would have more
+flexibility of deplyoment options.
+
+We know describe in detail the actual software behind our system. In
+Section~\ref{sec:overview} we discussed the high-level overview of our
+system. Now we will explain exactly what we did, and what we didn't
+do. We will start by describing our implementation of the processing
+group and then move on to the data warehousing group.
+
+\subsection{Processing Group}
+
+From a high-level perspective, the processing group is responsible for
+processing a set of receipts in an efficient and scalable manner. For
+this reason we chose to separate the role of process assignment and
+process fulfillment. Our ProcessDistributor acts as the assigner. It
+polls its listening socket and waits for a request to process a
+receipt. When it receives a request, it simply puts the request into a
+FIFO queue. A separate thread continuously polls the queue for
+elements and upon finding one creates a handling object that will
+process the item in the queue.
+
+The handling object attempts to execute a remote procedure call (RPC)
+to a ReceiptProcessingServer. The particular server chosen is
+determined by the ProcessDistributor and is currently just a
+round-robin approach. The RPC is a very lightweight object that is
+serialized and transferred via a Socket to the
+ReceiptProcessingServer. Upon receiving the RPC data, the processing
+server extracts the necessary information from the parameters to the
+RPC, saves the relevant data to the mySQL backend (see
+Section~\ref{sec:db.implementation}), and then returns a response.
+
+In our current setting, we do not actually perform any OCR on images
+and in fact just parse a string representation of a receipt. For a
+detailed discussion of why this is the case please see
+Section~\ref{sec:discussion}. The information that is parsed from the
+string representation includes the item name, price, quantity, seller,
+user information, etc. This information is saved to our mySQL cluster
+database through a mySQL connector.
+
+\remark{Explain exactly what we accomplished and how we measured our
+  success. Should describe the test cases that we used and how we
+  verified the system. Make mention that we failed in some areas but
+  direct the attention of the reader to the discussion section instead
+  of spelling it out here.}

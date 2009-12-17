@@ -1,0 +1,11 @@
+\begin{figure}[t]
+\centering
+\def\imw{0.75\columnwidth}
+\includegraphics[width=\imw]{figs/RCR.png}\vspace{-3mm}
+\caption[]{\textbf{Rapid Collaborative Refinement} By closing the
+  short-term iteration loop our team was able to efficiently develop
+  critical pieces of the system. The rapid switching between coding in
+  seclusion and collaborating to uncover and resolve problems allowed
+  us to very quickly refine aspects of the system.}
+\label{fig:RCR}
+\end{figure}

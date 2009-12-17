@@ -1,0 +1,7 @@
+\begin{figure*}[t]
+\centering
+\def\imw{0.75\columnwidth}
+\includegraphics[width=\imw]{figs/overview.png}\vspace{-3mm}
+\caption[]{\textbf{System Overview} Our system consists of three main parts: a gateway, a processing group, and a data warehousing group. The gateway accepts receipt requests and passed them on to the processing group. Once a receipt has been processed it is passed to the data warehousing group to be stored for future use.}
+\label{fig:overview}
+\end{figure*}
