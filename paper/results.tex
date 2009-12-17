@@ -24,7 +24,7 @@ present in receipts from many different companies. Therefore, we chose to consid
 \{receipt:RECEIPT ID\} \{item: ITEM NAME\} \{price: ITEM PRICE\} \{quantity: QUANTITY\} \{store: STORE ID\} \{date: PURCHASE DATE\}
 \end{centering}
 
-For our tests, we generated 100,000 lines of this format. We then
+For our tests, we generated 30,000 lines of this format. We then
 wrote a simple test harness that looped over the list and sent each
 line to the process distributor gateway. We ran this test with three
 processing servers available. The bottleneck in the system is the
@@ -34,7 +34,7 @@ of the non-processed receipts. In a setting where there are hundreds
 of thousands of receipts coming in at once, this can become a
 burden. However, even with a modest hardware configuration consisting
 of a MacBook Pro with 2GB of RAM and a 2.16GHz Core2 Duo we were able
-to handle \remark{XXX} requests. 
+to handle 30,000 requests arriving nearly simultaneously. 
 
 We also ran tests to assess the ability for our system to adapt to new
 or failed servers. We began by running the same test as before but in
@@ -43,4 +43,9 @@ to distribute the receipts effectively across the remaining servers in
 the pool. Likewise, if we added a new server, the disitrbutor was able
 to adapt and send receipts to the newly added one too. Our tests show
 that we have indeed created an effective receipt processing system
-than be scaled to meet demand.
+that can be scaled to meet demand.
+
+Since one of our goals was to develop our system in line with standard
+Software Engineering practice we also provide results for our logical,
+infrastructure, and use case diagrams. These are included in Appendix
+A.
